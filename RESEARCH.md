@@ -84,6 +84,12 @@ So the honest status: `ρ` is irrational (proved here, with the mechanism identi
 transcendence is open and no current method applies, and the natural next theorems in this
 framework are about the oscillation of `S(n)` rather than about the arithmetic nature of `ρ`.
 
+A detailed treatment is in `research/transcendence.md` (the criteria, what each would need
+from the primes, what is known about residues of consecutive primes, a rigorous bound on dyadic
+approximations, and the ranked research directions) and `research/transcendence-evidence.md`
+(computational evidence: PSLQ algebraicity tests, certified continued fraction statistics, digit
+statistics; reproduced by `scripts/transcendence_evidence.py`).
+
 ## 4. Files
 
 | File | Contents |
@@ -92,3 +98,6 @@ framework are about the oscillation of `S(n)` rather than about the arithmetic n
 | `RokickiConstant/General/EulerProduct.lean` | `primeTerm`, `primePart`, `primePowerPart` for any Dirichlet character; Euler product; analytic properties; blow-up for quadratic characters |
 | `RokickiConstant/General/CharacterSums.lean` | the general theorem: `Σ χ(p_k)` neither bounded nor linear |
 | `RokickiConstant/General/Irrational.lean` | irrationality of `Σ f(χ(p_k)) / b^{k+1}`; Rokicki's constant in every base; Legendre constants |
+| `research/transcendence.md` | the transcendence question: criteria, obstructions, directions |
+| `research/transcendence-evidence.md` | computational evidence (PSLQ, continued fractions, digits) |
+| `scripts/transcendence_evidence.py` | reproduces the evidence |
