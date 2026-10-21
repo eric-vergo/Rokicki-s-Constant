@@ -1,0 +1,20 @@
+name = "RokickiConstant"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["RokickiConstant"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+autoImplicit = false
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+weak.linter.mathlibStandardSet = true
+weak.linter.style.longLine = true
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.34.1"
+
+[[lean_lib]]
+name = "RokickiConstant"
