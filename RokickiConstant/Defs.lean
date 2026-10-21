@@ -34,7 +34,7 @@ Tom Rokicki observed that `aₙ / 2 ^ (n - 1)` converges, and `ρ` is its limit.
 * `RokickiConstant.χ₄_oddPrime`: the `k`-th digit is encoded by the value of the nontrivial
   Dirichlet character modulo `4` at the corresponding odd prime, `χ₄ pₖ₊₂ = 1 - 2 · rokickiDigit k`.
 
-The irrationality of `ρ` is proved in `RokickiConstant.Irrational`.
+The irrationality of `ρ` is proved in `Comparator/Solution.lean`.
 
 ## References
 
@@ -64,16 +64,12 @@ noncomputable def rokickiConstant : ℝ := ∑' k : ℕ, (rokickiDigit k : ℝ) 
 
 @[inherit_doc] scoped[RokickiConstant] notation "ρ" => Real.rokickiConstant
 
-/-- The primes after `2` are odd. -/
-private theorem odd_nth_prime_succ (k : ℕ) : Odd (Nat.nth Nat.Prime (k + 1)) := by
-  refine (Nat.prime_nth_prime _).eq_two_or_odd'.resolve_left fun h ↦ k.succ_ne_zero ?_
-  rw [← Nat.nth_prime_zero_eq_two] at h
-  exact Nat.nth_injective Nat.infinite_setOfPred_prime h
-
 /-- The primes after `2` are `1` or `3` modulo `4`. -/
 private theorem nth_prime_succ_mod_four (k : ℕ) :
-    Nat.nth Nat.Prime (k + 1) % 4 = 1 ∨ Nat.nth Nat.Prime (k + 1) % 4 = 3 :=
-  Nat.odd_mod_four_iff.mp (Nat.odd_iff.mp (odd_nth_prime_succ k))
+    Nat.nth Nat.Prime (k + 1) % 4 = 1 ∨ Nat.nth Nat.Prime (k + 1) % 4 = 3 := by
+  refine Nat.odd_mod_four_iff.mp
+    ((Nat.prime_nth_prime _).eq_two_or_odd.resolve_left fun h ↦ k.succ_ne_zero ?_)
+  exact Nat.nth_injective Nat.infinite_setOfPred_prime (h.trans Nat.nth_prime_zero_eq_two.symm)
 
 /-- The digits of Rokicki's constant are binary digits. -/
 theorem rokickiDigit_le_one (k : ℕ) : rokickiDigit k ≤ 1 := by
@@ -147,17 +143,9 @@ theorem oddPrime_strictMono : StrictMono oddPrime := fun _ _ h ↦
 theorem oddPrime_zero : oddPrime 0 = 3 :=
   Nat.nth_prime_one_eq_three
 
-/-- `oddPrime k` is odd. -/
-theorem odd_oddPrime (k : ℕ) : Odd (oddPrime k) :=
-  odd_nth_prime_succ k
-
 /-- Every odd prime is `1` or `3` modulo `4`. -/
 theorem oddPrime_mod_four (k : ℕ) : oddPrime k % 4 = 1 ∨ oddPrime k % 4 = 3 :=
   nth_prime_succ_mod_four k
-
-/-- The `k`-th odd prime is at least `k + 2`. -/
-theorem add_two_le_oddPrime (k : ℕ) : k + 2 ≤ oddPrime k :=
-  (Nat.le_succ _).trans (Nat.add_two_le_nth_prime (k + 1))
 
 /-- The quadratic character modulo `4` encodes the digits of `ρ`:
 `χ₄ pₖ₊₂ = 1 - 2 · rokickiDigit k`. -/

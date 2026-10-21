@@ -1,5 +1,6 @@
 import RokickiConstant.BinaryExpansion
 import RokickiConstant.CharacterSums
+import RokickiConstant.Chi4
 import RokickiConstant.Defs
-import RokickiConstant.LSeriesChi4
+import RokickiConstant.EulerProduct
 import RokickiConstant.PartialSums

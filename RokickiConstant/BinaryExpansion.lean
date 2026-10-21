@@ -3,9 +3,7 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.Algebra.Ring.Periodic
 import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Data.Set.Finite.Lemmas
 import Mathlib.NumberTheory.Real.Irrational
 
 /-!
@@ -52,16 +50,6 @@ sufficiently large `n`. Compare `Function.Periodic`, which demands this for all 
 def EventuallyPeriodic {α : Type*} (f : ℕ → α) (p : ℕ) : Prop :=
   ∀ᶠ n in atTop, f (n + p) = f n
 
-/-- A periodic function is eventually periodic. -/
-theorem Periodic.eventuallyPeriodic {α : Type*} {f : ℕ → α} {p : ℕ} (h : Periodic f p) :
-    EventuallyPeriodic f p :=
-  Eventually.of_forall h
-
-/-- Postcomposing an eventually periodic function preserves eventual periodicity. -/
-theorem EventuallyPeriodic.comp {α β : Type*} {f : ℕ → α} {p : ℕ} (h : EventuallyPeriodic f p)
-    (g : α → β) : EventuallyPeriodic (g ∘ f) p :=
-  h.mono fun _ hn ↦ congrArg g hn
-
 /-- An eventually periodic function with period `p` agrees with its shift by `p` from some
 index `N` on. -/
 theorem EventuallyPeriodic.exists_forall_le {α : Type*} {f : ℕ → α} {p : ℕ}
@@ -79,16 +67,11 @@ noncomputable def binaryTail (n : ℕ) : ℝ := ∑' k : ℕ, (d (n + k) : ℝ) 
 
 variable {d}
 
-/-- The geometric series `∑ₖ 1 / 2 ^ (k + 1)` sums to `1`. -/
-private theorem hasSum_one_div_two_pow_succ :
-    HasSum (fun k : ℕ ↦ (1 : ℝ) / 2 ^ (k + 1)) 1 := by
-  convert hasSum_geometric_two' 1 using 1
-  ext k
-  ring
-
-/-- Each term `d n / 2 ^ (k + 1)` of a binary expansion is at most `1 / 2 ^ (k + 1)`. -/
+/-- Each term `d n / 2 ^ (k + 1)` of a binary expansion is at most the term `1 / 2 / 2 ^ k` of
+the geometric series `hasSum_geometric_two' 1`. -/
 private theorem div_two_pow_le (hd : ∀ k, d k ≤ 1) (n k : ℕ) :
-    (d n : ℝ) / 2 ^ (k + 1) ≤ 1 / 2 ^ (k + 1) := by
+    (d n : ℝ) / 2 ^ (k + 1) ≤ 1 / 2 / 2 ^ k := by
+  rw [div_div, ← pow_succ']
   gcongr
   exact_mod_cast hd n
 
@@ -96,7 +79,7 @@ private theorem div_two_pow_le (hd : ∀ k, d k ≤ 1) (n k : ℕ) :
 theorem summable_binaryTail (hd : ∀ k, d k ≤ 1) (n : ℕ) :
     Summable fun k : ℕ ↦ (d (n + k) : ℝ) / 2 ^ (k + 1) :=
   .of_nonneg_of_le (fun _ ↦ by positivity) (fun k ↦ div_two_pow_le hd (n + k) k)
-    hasSum_one_div_two_pow_succ.summable
+    (hasSum_geometric_two' 1).summable
 
 /-- The tail at `0` is the value of the whole binary expansion. -/
 theorem binaryTail_zero : binaryTail d 0 = ∑' k : ℕ, (d k : ℝ) / 2 ^ (k + 1) := by
@@ -118,8 +101,8 @@ theorem binaryTail_succ (hd : ∀ k, d k ≤ 1) (n : ℕ) :
 /-- Every tail of a binary expansion lies in `[0, 1]`. -/
 theorem binaryTail_mem_Icc (hd : ∀ k, d k ≤ 1) (n : ℕ) : binaryTail d n ∈ Set.Icc (0 : ℝ) 1 :=
   ⟨tsum_nonneg fun _ ↦ by positivity, ((summable_binaryTail hd n).tsum_le_tsum
-    (fun k ↦ div_two_pow_le hd (n + k) k) hasSum_one_div_two_pow_succ.summable).trans_eq
-    hasSum_one_div_two_pow_succ.tsum_eq⟩
+    (fun k ↦ div_two_pow_le hd (n + k) k) (hasSum_geometric_two' 1).summable).trans_eq
+    (tsum_geometric_two' 1)⟩
 
 /-- A tail equals `1` if and only if all of its digits are `1`. -/
 theorem binaryTail_eq_one_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :
@@ -128,12 +111,10 @@ theorem binaryTail_eq_one_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :
   · by_contra hk
     have h0 : d (n + k) = 0 := by have := hd (n + k); omega
     refine h.not_lt (((summable_binaryTail hd n).tsum_lt_tsum (fun k ↦ div_two_pow_le hd (n + k) k)
-      (i := k) ?_ hasSum_one_div_two_pow_succ.summable).trans_eq
-      hasSum_one_div_two_pow_succ.tsum_eq)
+      (i := k) ?_ (hasSum_geometric_two' 1).summable).trans_eq (tsum_geometric_two' 1))
     rw [h0, Nat.cast_zero, zero_div]
     positivity
-  · simp only [binaryTail, h, Nat.cast_one]
-    exact hasSum_one_div_two_pow_succ.tsum_eq
+  · simpa only [binaryTail, h, Nat.cast_one, pow_succ', div_div] using tsum_geometric_two' 1
 
 /-- A tail equals `0` if and only if all of its digits are `0`. -/
 theorem binaryTail_eq_zero_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :

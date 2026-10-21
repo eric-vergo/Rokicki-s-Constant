@@ -3,7 +3,8 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import RokickiConstant.LSeriesChi4
+import Mathlib.NumberTheory.LSeries.Nonvanishing
+import RokickiConstant.EulerProduct
 
 /-!
 # The character sums `∑ χ₄ p` over primes are neither bounded nor linear
@@ -54,13 +55,14 @@ open Filter Topology Finset Complex
 
 namespace RokickiConstant
 
-/-- `‖L(σ, χ₄)‖ → ‖L(x, χ₄)‖` as `σ → x⁺` along the reals, since `L(·, χ₄)` is entire. -/
-theorem tendsto_norm_LFunction_chi4 (x : ℝ) :
-    Tendsto (fun σ : ℝ ↦ ‖DirichletCharacter.LFunction chi4 σ‖) (𝓝[>] x)
-      (𝓝 ‖DirichletCharacter.LFunction chi4 x‖) :=
-  tendsto_nhdsWithin_of_tendsto_nhds
-    (((DirichletCharacter.differentiable_LFunction chi4_ne_one).continuous.comp
-      Complex.continuous_ofReal).norm.tendsto x)
+/-- If `exp (F σ) = L(σ, χ₄)` for real `σ` near `x` on the right, then
+`Real.exp (re (F σ)) = ‖L(σ, χ₄)‖ → ‖L(x, χ₄)‖` as `σ → x⁺`, since `L(·, χ₄)` is entire. -/
+theorem tendsto_exp_re_of_exp_eq_LFunction {F : ℝ → ℂ} {x : ℝ}
+    (hF : ∀ᶠ σ : ℝ in 𝓝[>] x, exp (F σ) = DirichletCharacter.LFunction chi4 σ) :
+    Tendsto (fun σ ↦ Real.exp (F σ).re) (𝓝[>] x) (𝓝 ‖DirichletCharacter.LFunction chi4 x‖) :=
+  (tendsto_nhdsWithin_of_tendsto_nhds (((DirichletCharacter.differentiable_LFunction
+    chi4_ne_one).continuous.comp continuous_ofReal).norm.tendsto x)).congr'
+    (hF.mono fun σ hσ ↦ by simp [← hσ, Complex.norm_exp])
 
 section Linear
 
@@ -76,32 +78,22 @@ theorem abs_re_primePart_sub_mul_tsum_le {c C : ℝ}
     rw [chi4_natCast, ← Complex.ofReal_natCast, ← Complex.ofReal_neg,
       ← Complex.ofReal_cpow (Nat.cast_nonneg _), ← Complex.ofReal_intCast, ← Complex.ofReal_mul,
       Complex.ofReal_re]
-  have hχs : Summable fun k ↦ (ZMod.χ₄ (oddPrime k) : ℝ) * (oddPrime k : ℝ) ^ (-σ) :=
-    (Complex.reCLM.summable (summable_primePart hσ')).congr fun k ↦ hterm k
-  have hre : (primePart σ).re = ∑' k, (ZMod.χ₄ (oddPrime k) : ℝ) * (oddPrime k : ℝ) ^ (-σ) := by
-    rw [primePart, Complex.re_tsum (summable_primePart hσ')]
-    exact tsum_congr hterm
-  have key : (primePart σ).re - c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ) =
-      ∑' k, ((ZMod.χ₄ (oddPrime k) : ℝ) - c) * (oddPrime k : ℝ) ^ (-σ) := by
-    rw [hre, ← tsum_mul_left, ← hχs.tsum_sub (hfs.mul_left c)]
-    exact tsum_congr fun k ↦ by ring
-  have hes : Summable fun k ↦ ((ZMod.χ₄ (oddPrime k) : ℝ) - c) * (oddPrime k : ℝ) ^ (-σ) :=
-    (hχs.sub (hfs.mul_left c)).congr fun k ↦ by ring
+  have hs : HasSum (fun k ↦ ((ZMod.χ₄ (oddPrime k) : ℝ) - c) * (oddPrime k : ℝ) ^ (-σ))
+      ((primePart σ).re - c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ)) := by
+    convert (hasSum_re (summable_primePart hσ').hasSum).sub (hfs.hasSum.mul_left c) using 1
+    · exact funext fun k ↦ by rw [sub_mul, ← hterm k]; rfl
+    · rfl
   have he : ∀ n, |∑ k ∈ range n, ((ZMod.χ₄ (oddPrime k) : ℝ) - c)| ≤ C := fun n ↦ by
     simpa [Finset.sum_sub_distrib, mul_comm] using h n
   have hC : 0 ≤ C := (abs_nonneg _).trans (h 0)
   have hf0 : (oddPrime 0 : ℝ) ^ (-σ) ≤ 1 := by
     rw [oddPrime_zero]
     exact Real.rpow_le_one_of_one_le_of_nonpos (by norm_num) (by linarith)
-  rw [key]
+  rw [← hs.tsum_eq]
   calc _ ≤ 2 * C * (oddPrime 0 : ℝ) ^ (-σ) :=
-        abs_tsum_mul_le_of_abs_sum_le he (fun _ ↦ Real.rpow_nonneg (Nat.cast_nonneg _) _)
-          (antitone_natCast_rpow_neg (oddPrime_pos 0) oddPrime_strictMono (by linarith)) hes
+        abs_tsum_mul_le_of_abs_sum_le he (fun _ ↦ by positivity)
+          (antitone_natCast_rpow_neg (oddPrime_pos 0) oddPrime_strictMono (by linarith)) hs.summable
     _ ≤ 2 * C := mul_le_of_le_one_right (by linarith) hf0
-
-/-- `L(1, χ₄) ≠ 0`. -/
-theorem LFunction_chi4_one_ne_zero : DirichletCharacter.LFunction chi4 1 ≠ 0 :=
-  DirichletCharacter.LFunction_apply_one_ne_zero chi4_ne_one
 
 /-- The partial sums `∑_{k < n} χ₄ pₖ₊₂` are not of the form `c · n + O(1)` with `c ≠ 0`. -/
 theorem not_exists_abs_sum_chi4_sub_mul_le :
@@ -109,38 +101,22 @@ theorem not_exists_abs_sum_chi4_sub_mul_le :
       |(∑ k ∈ range n, (ZMod.χ₄ (oddPrime k) : ℝ)) - c * n| ≤ C := by
   rintro ⟨c, hc, C, h⟩
   obtain ⟨M, hM⟩ := exists_norm_primePowerPart_le
-  have hnorm : ∀ σ : ℝ, 1 < σ → ‖DirichletCharacter.LFunction chi4 σ‖ =
-      Real.exp ((primePart σ).re + (primePowerPart σ).re) := fun σ hσ ↦ by
-    rw [← exp_primePart_add_primePowerPart (by simpa using hσ), Complex.norm_exp, Complex.add_re]
-  have hP : ∀ σ : ℝ, 1 < σ → |(primePowerPart σ).re| ≤ M := fun σ hσ ↦
-    (Complex.abs_re_le_norm _).trans (hM _ (by rw [Complex.ofReal_re]; linarith))
-  have hev : ∀ᶠ σ in 𝓝[>] (1 : ℝ), 1 < σ := self_mem_nhdsWithin
-  have hL := tendsto_norm_LFunction_chi4 1
-  rw [Complex.ofReal_one] at hL
-  rcases hc.lt_or_gt with hc | hc
-  · have hlim : Tendsto
-        (fun σ : ℝ ↦ Real.exp (c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ) + (2 * C + M)))
-        (𝓝[>] (1 : ℝ)) (𝓝 0) :=
-      Real.tendsto_exp_atBot.comp <| tendsto_atBot_add_const_right _ _ <|
-        tendsto_tsum_oddPrime_rpow_neg.const_mul_atTop_of_neg hc
-    have h0 : Tendsto (fun σ : ℝ ↦ ‖DirichletCharacter.LFunction chi4 σ‖) (𝓝[>] 1) (𝓝 0) :=
-      squeeze_zero' (Eventually.of_forall fun _ ↦ norm_nonneg _) (hev.mono fun σ hσ ↦ by
-        rw [hnorm σ hσ]
-        exact Real.exp_le_exp.2 (by linarith [(abs_le.1 (hP σ hσ)).2,
-          (abs_le.1 (abs_re_primePart_sub_mul_tsum_le h hσ)).2])) hlim
-    exact LFunction_chi4_one_ne_zero
-      (norm_eq_zero.1 (tendsto_nhds_unique hL h0))
-  · have hlim : Tendsto
-        (fun σ : ℝ ↦ Real.exp (c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ) + -(2 * C + M)))
-        (𝓝[>] (1 : ℝ)) atTop :=
-      Real.tendsto_exp_atTop.comp <| tendsto_atTop_add_const_right _ _ <|
-        tendsto_tsum_oddPrime_rpow_neg.const_mul_atTop hc
-    refine not_tendsto_atTop_of_tendsto_nhds hL
-      (tendsto_atTop_mono' _ (hev.mono fun σ hσ ↦ ?_) hlim)
-    dsimp only
-    rw [hnorm σ hσ]
-    exact Real.exp_le_exp.2 (by linarith [(abs_le.1 (hP σ hσ)).1,
-      (abs_le.1 (abs_re_primePart_sub_mul_tsum_le h hσ)).1])
+  -- `re (primePart σ + primePowerPart σ) = log ‖L(σ, χ₄)‖` converges as `σ → 1⁺` ...
+  have hlim := (tendsto_exp_re_of_exp_eq_LFunction (F := fun σ ↦ primePart σ + primePowerPart σ)
+    (eventually_nhdsWithin_of_forall fun σ (hσ : 1 < σ) ↦
+      exp_primePart_add_primePowerPart (by simpa using hσ))).log
+    (by simpa using DirichletCharacter.LFunction_apply_one_ne_zero chi4_ne_one)
+  simp only [Real.log_exp] at hlim
+  -- ... but its absolute value is at least `|c| ∑ₖ pₖ₊₂ ^ (-σ) - 2 C - M → ∞`.
+  refine not_tendsto_atTop_of_tendsto_nhds hlim.abs (tendsto_atTop_mono' _ ?_
+    (tendsto_atTop_add_const_right _ (-(2 * C + M))
+      (tendsto_tsum_oddPrime_rpow_neg.const_mul_atTop (abs_pos.2 hc))))
+  filter_upwards [self_mem_nhdsWithin] with σ (hσ : 1 < σ)
+  have h1 := abs_re_primePart_sub_mul_tsum_le h hσ
+  have h2 := (abs_re_le_norm _).trans (hM σ (by simp [hσ.le]))
+  rw [abs_le] at h1 h2
+  rcases abs_cases c with ⟨hc', -⟩ | ⟨hc', -⟩ <;> rw [hc', add_re, le_abs] <;> [left; right] <;>
+    linarith [h1.1, h1.2, h2.1, h2.2]
 
 end Linear
 
@@ -158,14 +134,6 @@ theorem norm_sum_chi4_le (n : ℕ) : ‖∑ j ∈ range n, chi4 (oddPrime j)‖ 
     rfl
   rw [this, Complex.norm_real, Real.norm_eq_abs]
   exact hC n
-
-/-- Under bounded partial sums, the Abel series of `χ₄` over the odd primes agrees with
-`primePart` for `1 < re s`. -/
-theorem abelSeries_eq_primePart {s : ℂ} (hs : 1 < s.re) :
-    abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime s = primePart s := by
-  rw [primePart]
-  exact abelSeries_eq_tsum (norm_sum_chi4_le hC) (oddPrime_pos 0)
-    oddPrime_strictMono hs
 
 /-- Under bounded partial sums, the Abel series of `χ₄` over the odd primes is holomorphic on
 `0 < re s`. -/
@@ -191,23 +159,10 @@ theorem exp_abelSeries_add_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
       primePowerPart s)) =ᶠ[𝓝 2] DirichletCharacter.LFunction chi4 := by
     filter_upwards [(isOpen_lt continuous_const Complex.continuous_re).mem_nhds
       (show (1 : ℝ) < (2 : ℂ).re by norm_num)] with s hs
-    rw [abelSeries_eq_primePart hC hs, exp_primePart_add_primePowerPart hs]
+    rw [abelSeries_eq_tsum (norm_sum_chi4_le hC) (oddPrime_pos 0) oddPrime_strictMono hs]
+    exact exp_primePart_add_primePowerPart hs
   exact hf.eqOn_of_preconnected_of_eventuallyEq hg (convex_halfSpace_re_gt (1 / 2)).isPreconnected
     (show (1 / 2 : ℝ) < (2 : ℂ).re by norm_num) hfg hs
-
-/-- Under bounded partial sums, the real part of the Abel series of `χ₄` over the odd primes is
-continuous at `1 / 2` from the right. -/
-theorem tendsto_re_abelSeries_chi4 :
-    Tendsto (fun σ : ℝ ↦ (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime σ).re)
-      (𝓝[>] (1 / 2 : ℝ))
-      (𝓝 (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime (1 / 2 : ℝ)).re) := by
-  have hU : IsOpen {s : ℂ | 0 < s.re} := isOpen_lt continuous_const Complex.continuous_re
-  have hcont : ContinuousAt (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime)
-      ((1 / 2 : ℝ) : ℂ) :=
-    (differentiableOn_abelSeries_chi4 hC).continuousOn.continuousAt
-      (hU.mem_nhds (show 0 < ((1 / 2 : ℝ) : ℂ).re by norm_num))
-  exact tendsto_nhdsWithin_of_tendsto_nhds (Complex.continuous_re.continuousAt.tendsto.comp
-    (hcont.tendsto.comp (Complex.continuous_ofReal.tendsto _)))
 
 end Bounded
 
@@ -215,14 +170,16 @@ end Bounded
 theorem not_exists_abs_sum_chi4_le :
     ¬ ∃ C : ℝ, ∀ n, |∑ k ∈ range n, (ZMod.χ₄ (oddPrime k) : ℝ)| ≤ C := by
   rintro ⟨C, hC⟩
-  have hev : ∀ᶠ σ : ℝ in 𝓝[>] (1 / 2 : ℝ), Real.exp
-      ((abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime σ).re + (primePowerPart σ).re) =
-        ‖DirichletCharacter.LFunction chi4 σ‖ :=
-    eventually_nhdsWithin_of_forall fun σ (hσ : 1 / 2 < σ) ↦ by
-      rw [← exp_abelSeries_add_primePowerPart hC (by simpa using hσ), Complex.norm_exp,
-        Complex.add_re]
-  exact not_tendsto_atTop_of_tendsto_nhds (tendsto_norm_LFunction_chi4 (1 / 2))
-    ((Real.tendsto_exp_atTop.comp
-      ((tendsto_re_abelSeries_chi4 hC).add_atTop tendsto_re_primePowerPart)).congr' hev)
+  set A := abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime
+  -- `re (A σ)` is continuous at `σ = 1 / 2`, while `re (primePowerPart σ) → ∞` as `σ → 1 / 2⁺`
+  have hA : ContinuousAt (fun σ : ℝ ↦ (A σ).re) (1 / 2) :=
+    continuous_re.continuousAt.comp (((differentiableOn_abelSeries_chi4 hC).continuousOn
+      |>.continuousAt ((isOpen_lt continuous_const continuous_re).mem_nhds
+        (show 0 < ((1 / 2 : ℝ) : ℂ).re by norm_num))).comp continuous_ofReal.continuousAt)
+  exact not_tendsto_atTop_of_tendsto_nhds (tendsto_exp_re_of_exp_eq_LFunction
+    (F := fun σ ↦ A σ + primePowerPart σ) (eventually_nhdsWithin_of_forall
+      fun σ (hσ : 1 / 2 < σ) ↦ exp_abelSeries_add_primePowerPart hC (by simpa using hσ)))
+    (Real.tendsto_exp_atTop.comp
+      ((hA.tendsto.mono_left nhdsWithin_le_nhds).add_atTop tendsto_re_primePowerPart))
 
 end RokickiConstant

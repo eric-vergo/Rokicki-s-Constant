@@ -179,15 +179,6 @@ theorem norm_ofReal_cpow_neg_sub_cpow_neg_le {x y δ : ℝ} (hx : 1 ≤ x) (hxy 
       field_simp
       ring
 
-/-- The estimate `‖m ^ (-s) - n ^ (-s)‖ ≤ ‖s‖ / re s · (m ^ (-re s) - n ^ (-re s))` for natural
-numbers `0 < m ≤ n` and `0 < re s`. -/
-theorem norm_cpow_neg_sub_cpow_neg_le {m n : ℕ} (hm : 0 < m) (hmn : m ≤ n) {s : ℂ}
-    (hs : 0 < s.re) :
-    ‖(m : ℂ) ^ (-s) - (n : ℂ) ^ (-s)‖ ≤ ‖s‖ / s.re * ((m : ℝ) ^ (-s.re) - (n : ℝ) ^ (-s.re)) := by
-  have h := norm_ofReal_cpow_neg_sub_cpow_neg_le (Nat.one_le_cast.2 hm) (Nat.cast_le.2 hmn) hs
-    le_rfl
-  simpa only [Complex.ofReal_natCast] using h
-
 /-- For a strictly increasing sequence `q` of positive integers and `0 ≤ δ`, the sequence
 `q k ^ (-δ)` is antitone. -/
 theorem antitone_natCast_rpow_neg (hq₀ : 0 < q 0) (hq : StrictMono q) {δ : ℝ} (hδ : 0 ≤ δ) :
@@ -252,24 +243,23 @@ theorem differentiableOn_abelSeries {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n,
       gcongr
   exact (hd.differentiableAt (hU.mem_nhds hs₀U)).differentiableWithinAt
 
+/-- For a strictly increasing sequence `q` of positive integers, `∑ₖ q k ^ r` converges for
+`r < -1`. -/
+theorem summable_natCast_rpow (hq₀ : 0 < q 0) (hq : StrictMono q) {r : ℝ} (hr : r < -1) :
+    Summable fun k ↦ (q k : ℝ) ^ r := by
+  refine .of_nonneg_of_le (fun _ ↦ by positivity) (fun k ↦ Real.rpow_le_rpow_of_nonpos
+    (by positivity) (by exact_mod_cast (hq.add_le_nat k 0).trans' (by omega)) (by linarith))
+    ((summable_nat_add_iff 1).2 (Real.summable_nat_rpow.2 hr))
+
 /-- A Dirichlet series `∑ₖ a k · q k ^ (-s)` with bounded coefficients over a strictly increasing
 sequence of positive integers converges absolutely for `1 < re s`. -/
 theorem summable_mul_cpow_neg {C : ℝ} (ha : ∀ k, ‖a k‖ ≤ C) (hq₀ : 0 < q 0) (hq : StrictMono q)
     {s : ℂ} (hs : 1 < s.re) : Summable fun k : ℕ ↦ a k * (q k : ℂ) ^ (-s) := by
-  have hC : 0 ≤ C := (norm_nonneg _).trans (ha 0)
-  have hqk : ∀ k, k + 1 ≤ q k := fun k ↦ by
-    induction k with
-    | zero => omega
-    | succ k ih =>
-      have : q k < q (k + 1) := hq (by omega)
-      omega
-  have hsum : Summable fun k : ℕ ↦ C * ((k + 1 : ℕ) : ℝ) ^ (-s.re) :=
-    ((summable_nat_add_iff (f := fun n : ℕ ↦ (n : ℝ) ^ (-s.re)) 1).2
-      (Real.summable_nat_rpow.2 (by linarith))).mul_left C
-  refine Summable.of_norm_bounded hsum fun k ↦ ?_
-  rw [norm_mul, Complex.norm_natCast_cpow_of_pos (by have := hqk k; omega), Complex.neg_re]
-  exact mul_le_mul (ha k) (Real.rpow_le_rpow_of_nonpos (by positivity)
-    (by exact_mod_cast hqk k) (by linarith)) (by positivity) hC
+  refine .of_norm_bounded ((summable_natCast_rpow hq₀ hq (r := -s.re) (by linarith)).mul_left C)
+    fun k ↦ ?_
+  rw [norm_mul, Complex.norm_natCast_cpow_of_pos (hq₀.trans_le (hq.monotone k.zero_le)),
+    Complex.neg_re]
+  exact mul_le_mul_of_nonneg_right (ha k) (by positivity)
 
 /-- For `1 < re s` the Abel series agrees with the Dirichlet series it came from. -/
 theorem abelSeries_eq_tsum {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n, a j‖ ≤ C) (hq₀ : 0 < q 0)

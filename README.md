@@ -37,7 +37,8 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/Defs.lean` | `Real.rokickiDigit`, `Real.rokickiConstant`, the odd primes, link to `ZMod.χ₄` |
 | `RokickiConstant/BinaryExpansion.lean` | rationals have eventually periodic binary expansions |
 | `RokickiConstant/PartialSums.lean` | partial sums of eventually periodic sequences; summation by parts; Abel series |
-| `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
+| `RokickiConstant/Chi4.lean` | the character `chi4` at the odd primes; sums over the primes; divergence of `Σ_p p^(-σ)` as `σ → 1⁺` |
+| `RokickiConstant/EulerProduct.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
 | `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
 | `Comparator/Challenge.lean` | the comparator as a challenge: `rho` defined directly from the specification and `theorem rho_irrational : Irrational rho := by sorry` |
 | `Comparator/Solution.lean` | the same file with the proof filled in, by identifying `rho` with `Real.rokickiConstant` |
