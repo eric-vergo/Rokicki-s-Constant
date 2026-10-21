@@ -43,7 +43,9 @@ function `L(·, χ₄)` stays bounded.
 | `Comparator/Challenge.lean` | the comparator as a challenge: `rho` defined directly from the specification and `theorem rho_irrational : Irrational rho := by sorry` |
 | `Comparator/Solution.lean` | the same file with the proof filled in, by identifying `rho` with `Real.rokickiConstant` |
 | `blueprint/` | the Verso blueprint: introduction, chapters, dependency graph |
+| `RokickiConstant/General/` | the general theorem for quadratic characters and its corollaries (research fork) |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
+| `scripts/constants.py` | numerical values of the generalized constants |
 
 ## Comparator
 
@@ -57,6 +59,15 @@ only in imports, docstring prose and the proof body, so `diff` on them is the au
 Complete: `lake build` (the development and the comparator solution) succeeds with no `sorry` and
 no warnings, and `#print axioms rho_irrational` reports only `propext`, `Classical.choice` and `Quot.sound`. `lake build ComparatorChallenge`
 elaborates the challenge alone and reports its one intentional `sorry`.
+
+## Research fork
+
+The branch `research/general-character` generalizes the result, see [RESEARCH.md](RESEARCH.md):
+for every nonprincipal quadratic Dirichlet character `χ` the partial sums of `χ` over the primes
+are neither bounded nor `c·π(x) + O(1)` with `c ≠ 0`, and consequently the numbers
+`Σ_k f(χ(p_k)) / b^(k+1)` are irrational for every base `b ≥ 2`, including Rokicki's digits read
+in any base and the Legendre constants of odd primes. It also discusses what the framework says
+about other bases and about transcendence.
 
 ## Blueprint
 

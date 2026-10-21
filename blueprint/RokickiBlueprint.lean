@@ -15,6 +15,7 @@ import RokickiBlueprint.PartialSums
 import RokickiBlueprint.EulerProduct
 import RokickiBlueprint.CharacterSums
 import RokickiBlueprint.MainTheorem
+import RokickiBlueprint.Generalizations
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -33,6 +34,7 @@ authors := ["Eric Vergo"]
 {include 0 RokickiBlueprint.EulerProduct}
 {include 0 RokickiBlueprint.CharacterSums}
 {include 0 RokickiBlueprint.MainTheorem}
+{include 0 RokickiBlueprint.Generalizations}
 
 {blueprint_graph}
 

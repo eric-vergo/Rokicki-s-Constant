@@ -38,7 +38,7 @@ lemma on `main`). The irrationality of Rokicki's constant is really the statemen
 
 * **Ternary, or any base.** `ρ_b = Σ_k [p_{k+2} ≡ 3 (mod 4)] / b^{k+1}` is irrational for every
   `b ≥ 2` (`Real.irrational_rokickiConstantBase`). These are different numbers for different
-  `b` (`ρ_2 = 0.7004…`, `ρ_3 = 0.4225…`), not affine images of one another: the map
+  `b` (`ρ_2 = 0.70040…`, `ρ_3 = 0.38334…`, `ρ_10 = 0.10110…`; see `scripts/constants.py`), not affine images of one another: the map
   "same digits, different base" is highly nonlinear (it is not even continuous in the usual
   topology). The question is uninteresting only in the sense that it is *free*: the proof is the
   same, because it was never about the base.
@@ -48,8 +48,9 @@ lemma on `main`). The irrationality of Rokicki's constant is really the statemen
   `Σ_k f(χ(p_k)) / b^{k+1}` is irrational (`DirichletCharacter.IsQuadratic.irrational_tsum`).
   For an odd prime `ℓ`, taking `χ = (·/ℓ)` the Legendre symbol gives: the number whose `k`-th
   digit records whether `p_k` is a quadratic non-residue modulo `ℓ` is irrational
-  (`Real.irrational_legendreConstant`). Modulo `4` this recovers Rokicki's constant, modulo `8`
-  there are two more such constants (`χ₈`, `χ₈'`), and so on.
+  (`Real.irrational_legendreConstant`); numerically `λ_(3,2) = 0.66716…`, `λ_(5,2) = 0.83824…`,
+  `λ_(7,2) = 0.40299…`. Modulo `4` this recovers Rokicki's constant, modulo `8` there are two
+  more such constants (`χ₈`, `χ₈'`), and so on.
 
 * **Encoding the full residue `p mod q`.** For `q ≥ 3` the number
   `Σ_k (p_k mod q) / b^{k+1}` (any `b > q`) is irrational: its digits determine the residues,
