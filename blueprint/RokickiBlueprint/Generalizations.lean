@@ -6,6 +6,8 @@ Authors: Eric Vergo
 import VersoManual
 import VersoBlueprint
 import RokickiConstant.General.Irrational
+import RokickiConstant.General.Normal
+import RokickiConstant.General.ResidueConstant
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -150,4 +152,52 @@ $`p_k` is a quadratic non-residue modulo $`\ell` and $`0` otherwise is irrationa
 :::proof "legendre_constant" (uses := "general_irrational")
 Apply the general theorem to the Legendre symbol modulo $`\ell`, which is a nonprincipal
 quadratic character for $`\ell \neq 2`.
+:::
+
+:::theorem "exists_quadratic_character" (lean := "DirichletCharacter.exists_isQuadratic_ne_one")
+Every modulus $`q \geq 3` carries a nonprincipal quadratic Dirichlet character.
+:::
+
+:::proof "exists_quadratic_character"
+If $`q` has an odd prime factor $`\ell`, lift the Legendre symbol modulo $`\ell` to level $`q`;
+otherwise $`q` is a power of $`2` with $`4 \mid q`, and lift $`\chi_4`. Lifting preserves both
+properties.
+:::
+
+:::theorem "residue_constant" (lean := "Real.irrational_residueConstant")
+For every $`q \geq 3` and base $`b > q`, the number whose $`k`-th base-$`b` digit is the residue
+$`p_k \bmod q` is irrational.
+:::
+
+:::proof "residue_constant" (uses := "exists_quadratic_character, general_irrational_of_not_periodic, general_not_linear, general_not_bounded, periodic_partial_sums")
+Eventually periodic digits would make the residues $`p_k \bmod q` eventually periodic, hence
+the values $`\chi(p_k)` of the character of the previous theorem, which contradicts the general
+theorem as before.
+:::
+
+# Conditional normality
+
+:::definition "is_normal" (lean := "_root_.wordCount, IsNormalSeq, Real.IsNormal")
+A digit sequence over $`\{0, \ldots, b-1\}` is *normal* if every word of length $`L` occurs with
+limiting frequency $`b^{-L}` (overlapping count). A real number in $`[0, 1]` is normal in base
+$`b` if it has a normal base-$`b` digit expansion; such an expansion is never eventually
+constant, so it is the canonical one and this is Borel's definition.
+:::
+
+:::definition "consecutive_primes_equidistributed" (lean := "ConsecutivePrimesEquidistributed")
+The *equidistribution conjecture* modulo $`q`: for every word $`a` of units modulo $`q`, the
+proportion of $`m < n` with $`p_{m+i} \equiv a_i \pmod q` for all $`i < L` tends to
+$`\varphi(q)^{-L}`. It follows from the Hardy–Littlewood prime tuples conjecture
+(Lemke Oliver–Soundararajan, 2016) and is open for every $`q \geq 3`.
+:::
+
+:::theorem "conditional_normality" (lean := "Real.isNormal_rokickiConstant_of_consecutivePrimesEquidistributed") (uses := "is_normal, consecutive_primes_equidistributed, rokicki_constant")
+If the residue patterns of consecutive primes modulo $`4` are equidistributed, then Rokicki's
+constant is normal in base $`2`.
+:::
+
+:::proof "conditional_normality" (uses := "digit")
+A word $`w` of digits occurs at position $`m` exactly when the odd primes $`p_{m+2}, \ldots, p_{m+L+1}`
+have the residues prescribed by $`w`; the two counts differ by the shift of one index, which does
+not affect frequencies, and $`\varphi(4) = 2`.
 :::

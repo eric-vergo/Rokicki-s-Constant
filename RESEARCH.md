@@ -53,10 +53,17 @@ lemma on `main`). The irrationality of Rokicki's constant is really the statemen
   more such constants (`χ₈`, `χ₈'`), and so on.
 
 * **Encoding the full residue `p mod q`.** For `q ≥ 3` the number
-  `Σ_k (p_k mod q) / b^{k+1}` (any `b > q`) is irrational: its digits determine the residues,
-  hence the values of any quadratic character mod `q`, and `(ℤ/q)^×` has even order so such a
-  character exists. The existence step is not formalized on this branch; the prime-modulus
-  case is, via the Legendre symbol.
+  `Σ_k (p_k mod q) / b^{k+1}` (any `b > q`) is irrational (`Real.irrational_residueConstant`):
+  its digits determine the residues, hence the values of any quadratic character mod `q`, and
+  every `q ≥ 3` carries a nonprincipal quadratic character
+  (`DirichletCharacter.exists_isQuadratic_ne_one`: the Legendre symbol of an odd prime factor,
+  or `χ₄` for powers of `2`, lifted to level `q`).
+
+* **Conditional normality.** `Real.isNormal_rokickiConstant_of_consecutivePrimesEquidistributed`:
+  if residue patterns of consecutive primes modulo `4` are equidistributed
+  (`ConsecutivePrimesEquidistributed 4`, a consequence of the Hardy–Littlewood prime tuples
+  conjecture), then `ρ` is normal in base `2`. The implication is unconditional; the hypothesis
+  is open. See `research/transcendence.md` §5.
 
 ## 3. Transcendence
 
@@ -98,6 +105,8 @@ statistics; reproduced by `scripts/transcendence_evidence.py`).
 | `RokickiConstant/General/EulerProduct.lean` | `primeTerm`, `primePart`, `primePowerPart` for any Dirichlet character; Euler product; analytic properties; blow-up for quadratic characters |
 | `RokickiConstant/General/CharacterSums.lean` | the general theorem: `Σ χ(p_k)` neither bounded nor linear |
 | `RokickiConstant/General/Irrational.lean` | irrationality of `Σ f(χ(p_k)) / b^{k+1}`; Rokicki's constant in every base; Legendre constants |
+| `RokickiConstant/General/ResidueConstant.lean` | a nonprincipal quadratic character exists for every `q ≥ 3`; the residue constants are irrational |
+| `RokickiConstant/General/Normal.lean` | normality definitions; `ρ` is normal in base 2 if consecutive-prime residue patterns mod 4 are equidistributed |
 | `research/transcendence.md` | the transcendence question: criteria, obstructions, directions |
 | `research/transcendence-evidence.md` | computational evidence (PSLQ, continued fractions, digits) |
 | `scripts/transcendence_evidence.py` | reproduces the evidence |
