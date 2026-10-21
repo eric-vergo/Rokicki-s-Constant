@@ -1,7 +1,7 @@
 name = "RokickiConstant"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["RokickiConstant"]
+defaultTargets = ["RokickiConstant", "Comparator"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -20,3 +20,11 @@ rev = "v4.34.1"
 
 [[lean_lib]]
 name = "RokickiConstant"
+
+[[lean_lib]]
+name = "Comparator"
+roots = ["Comparator.Solution"]
+
+[[lean_lib]]
+name = "ComparatorChallenge"
+roots = ["Comparator.Challenge"]

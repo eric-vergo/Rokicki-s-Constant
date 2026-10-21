@@ -35,14 +35,23 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
 | `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
 | `RokickiConstant/Irrational.lean` | the main theorem |
-| `RokickiConstant/Comparator.lean` | the specification restated independently (the series, the OEIS recurrence, the comparator statement `Irrational Real.rokickiConstant`), checked against the development |
+| `Comparator/Challenge.lean` | the comparator as a challenge: `rho` defined directly from the specification and `theorem rho_irrational : Irrational rho := by sorry` |
+| `Comparator/Solution.lean` | the same file with the proof filled in, by identifying `rho` with `Real.rokickiConstant` |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
+
+## Comparator
+
+`Comparator/Challenge.lean` states the problem in the most direct terms, with no reference to the
+development: `rho` as the specified series over `Nat.nth Nat.Prime`, and `Irrational rho` left as
+`sorry`. `Comparator/Solution.lean` is the same file with the proof filled in. The two files differ
+only in imports, docstring prose and the proof body, so `diff` on them is the audit.
 
 ## Status
 
-Complete: `lake build` succeeds with no `sorry` and no warnings, and
-`#print axioms Real.irrational_rokickiConstant` reports only `propext`, `Classical.choice` and
-`Quot.sound`.
+Complete: `lake build` (the development and the comparator solution) succeeds with no `sorry` and
+no warnings, and `#print axioms` reports only `propext`, `Classical.choice` and `Quot.sound` for
+both `Real.irrational_rokickiConstant` and `rho_irrational`. `lake build ComparatorChallenge`
+elaborates the challenge alone and reports its one intentional `sorry`.
 
 ## Building
 

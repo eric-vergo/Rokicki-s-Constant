@@ -1,6 +1,5 @@
 import RokickiConstant.BinaryExpansion
 import RokickiConstant.CharacterSums
-import RokickiConstant.Comparator
 import RokickiConstant.Defs
 import RokickiConstant.Irrational
 import RokickiConstant.LSeriesChi4
