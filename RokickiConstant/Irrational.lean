@@ -3,7 +3,7 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import RokickiConstant.LSeriesChi4
+import RokickiConstant.CharacterSums
 
 /-!
 # Rokicki's constant is irrational
@@ -43,7 +43,9 @@ open RokickiConstant
 theorem irrational_rokickiConstant : Irrational rokickiConstant := by
   refine irrational_tsum_div_two_pow rokickiDigit_le_one fun p hp hd ↦ ?_
   have ha : EventuallyPeriodic (fun k ↦ ZMod.χ₄ (oddPrime k)) p := by
-    sorry
+    unfold EventuallyPeriodic at hd ⊢
+    filter_upwards [hd] with n hn
+    rw [χ₄_oddPrime, χ₄_oddPrime, hn]
   obtain ⟨c, C, hC⟩ := ha.exists_abs_sum_sub_mul_le hp
   by_cases hc : (c : ℝ) = 0
   · exact not_exists_abs_sum_chi4_le ⟨C, fun n ↦ by simpa [hc] using hC n⟩

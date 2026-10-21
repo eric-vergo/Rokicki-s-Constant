@@ -32,9 +32,16 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/Defs.lean` | `Real.rokickiDigit`, `Real.rokickiConstant`, the odd primes, link to `ZMod.χ₄` |
 | `RokickiConstant/BinaryExpansion.lean` | rationals have eventually periodic binary expansions |
 | `RokickiConstant/PartialSums.lean` | partial sums of eventually periodic sequences; summation by parts; Abel series |
-| `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)`; the character sums are neither bounded nor linear |
+| `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
+| `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
 | `RokickiConstant/Irrational.lean` | the main theorem |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
+
+## Status
+
+Complete: `lake build` succeeds with no `sorry` and no warnings, and
+`#print axioms Real.irrational_rokickiConstant` reports only `propext`, `Classical.choice` and
+`Quot.sound`.
 
 ## Building
 
