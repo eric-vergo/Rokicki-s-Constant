@@ -5,8 +5,8 @@ Authors: Eric Vergo
 -/
 import Mathlib.Algebra.Ring.Periodic
 import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.NumberTheory.Real.Irrational
 import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.NumberTheory.Real.Irrational
 
 /-!
 # Rational numbers have eventually periodic binary expansions
@@ -43,7 +43,7 @@ binary expansion, eventually periodic, irrational
 set_option doc.verso true
 set_option doc.verso.suggestions false
 
-open Filter Topology
+open Filter
 
 namespace Function
 
@@ -52,10 +52,12 @@ sufficiently large `n`. Compare `Function.Periodic`, which demands this for all 
 def EventuallyPeriodic {α : Type*} (f : ℕ → α) (p : ℕ) : Prop :=
   ∀ᶠ n in atTop, f (n + p) = f n
 
+/-- A periodic function is eventually periodic. -/
 theorem Periodic.eventuallyPeriodic {α : Type*} {f : ℕ → α} {p : ℕ} (h : Periodic f p) :
     EventuallyPeriodic f p :=
   Eventually.of_forall h
 
+/-- Postcomposing an eventually periodic function preserves eventual periodicity. -/
 theorem EventuallyPeriodic.comp {α β : Type*} {f : ℕ → α} {p : ℕ} (h : EventuallyPeriodic f p)
     (g : α → β) : EventuallyPeriodic (g ∘ f) p :=
   h.mono fun _ hn ↦ congrArg g hn
@@ -84,19 +86,23 @@ private theorem hasSum_one_div_two_pow_succ :
   ext k
   ring
 
+/-- Each term `d n / 2 ^ (k + 1)` of a binary expansion is at most `1 / 2 ^ (k + 1)`. -/
 private theorem div_two_pow_le (hd : ∀ k, d k ≤ 1) (n k : ℕ) :
     (d n : ℝ) / 2 ^ (k + 1) ≤ 1 / 2 ^ (k + 1) := by
   gcongr
   exact_mod_cast hd n
 
+/-- The series defining `binaryTail d n` converges. -/
 theorem summable_binaryTail (hd : ∀ k, d k ≤ 1) (n : ℕ) :
     Summable fun k : ℕ ↦ (d (n + k) : ℝ) / 2 ^ (k + 1) :=
   .of_nonneg_of_le (fun _ ↦ by positivity) (fun k ↦ div_two_pow_le hd (n + k) k)
     hasSum_one_div_two_pow_succ.summable
 
+/-- The tail at `0` is the value of the whole binary expansion. -/
 theorem binaryTail_zero : binaryTail d 0 = ∑' k : ℕ, (d k : ℝ) / 2 ^ (k + 1) := by
   simp only [binaryTail, zero_add]
 
+/-- Shifting a binary expansion by one digit: `T (n + 1) = 2 T n - d n`. -/
 theorem binaryTail_succ (hd : ∀ k, d k ≤ 1) (n : ℕ) :
     binaryTail d (n + 1) = 2 * binaryTail d n - d n := by
   have h : binaryTail d n = d n / 2 + binaryTail d (n + 1) / 2 := by
@@ -109,11 +115,13 @@ theorem binaryTail_succ (hd : ∀ k, d k ≤ 1) (n : ℕ) :
       ring
   linarith
 
+/-- Every tail of a binary expansion lies in `[0, 1]`. -/
 theorem binaryTail_mem_Icc (hd : ∀ k, d k ≤ 1) (n : ℕ) : binaryTail d n ∈ Set.Icc (0 : ℝ) 1 :=
   ⟨tsum_nonneg fun _ ↦ by positivity, ((summable_binaryTail hd n).tsum_le_tsum
     (fun k ↦ div_two_pow_le hd (n + k) k) hasSum_one_div_two_pow_succ.summable).trans_eq
     hasSum_one_div_two_pow_succ.tsum_eq⟩
 
+/-- A tail equals `1` if and only if all of its digits are `1`. -/
 theorem binaryTail_eq_one_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :
     binaryTail d n = 1 ↔ ∀ k, d (n + k) = 1 := by
   refine ⟨fun h k ↦ ?_, fun h ↦ ?_⟩
@@ -127,6 +135,7 @@ theorem binaryTail_eq_one_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :
   · simp only [binaryTail, h, Nat.cast_one]
     exact hasSum_one_div_two_pow_succ.tsum_eq
 
+/-- A tail equals `0` if and only if all of its digits are `0`. -/
 theorem binaryTail_eq_zero_iff (hd : ∀ k, d k ≤ 1) {n : ℕ} :
     binaryTail d n = 0 ↔ ∀ k, d (n + k) = 0 := by
   refine ⟨fun h k ↦ ?_, fun h ↦ by simp [binaryTail, h]⟩
@@ -200,8 +209,7 @@ theorem finite_range_binaryTail (hd : ∀ k, d k ≤ 1)
   obtain ⟨z, hz⟩ : ∃ z : ℤ, (q.den : ℝ) * binaryTail d n = z := by
     refine ⟨2 ^ n * q.num - q.den * ∑ k ∈ Finset.range n, (d k : ℤ) * 2 ^ (n - 1 - k), ?_⟩
     push_cast
-    rw [← two_pow_mul_tsum_sub_binaryTail hd n, ← hq]
-    rw [← hqD]
+    rw [← two_pow_mul_tsum_sub_binaryTail hd n, ← hq, ← hqD]
     ring
   have hz0 : (0 : ℝ) ≤ z := hz ▸ mul_nonneg hD.le hT.1
   obtain ⟨m, rfl⟩ := Int.eq_ofNat_of_zero_le (by exact_mod_cast hz0)

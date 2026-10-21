@@ -6,8 +6,6 @@ Authors: Eric Vergo
 import Mathlib.Analysis.Complex.LocallyUniformLimit
 import Mathlib.Analysis.PSeries
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
-import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import RokickiConstant.BinaryExpansion
 
 /-!
@@ -95,17 +93,13 @@ section SummationByParts
 
 /-- **Summation by parts**: `∑ k ∈ range (n + 1), a k * w k` equals the boundary term
 `(∑ j ∈ range (n + 1), a j) * w n` plus the sum
-`∑ k ∈ range n, (∑ j ∈ range (k + 1), a j) * (w k - w (k + 1))`. -/
+`∑ k ∈ range n, (∑ j ∈ range (k + 1), a j) * (w k - w (k + 1))`. This is
+`Finset.sum_range_by_parts'` with the differences of `w` taken in the opposite order. -/
 theorem sum_range_succ_mul_eq_sum_mul_sub {R : Type*} [CommRing R] (a w : ℕ → R) (n : ℕ) :
     ∑ k ∈ range (n + 1), a k * w k = (∑ j ∈ range (n + 1), a j) * w n +
       ∑ k ∈ range n, (∑ j ∈ range (k + 1), a j) * (w k - w (k + 1)) := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [sum_range_succ (fun k ↦ a k * w k), ih,
-      sum_range_succ (fun k ↦ (∑ j ∈ range (k + 1), a j) * (w k - w (k + 1))) n,
-      sum_range_succ a (n + 1)]
-    ring
+  simp only [← smul_eq_mul, sum_range_by_parts' a w (n + 1), Nat.add_sub_cancel, sub_eq_add_neg,
+    ← sum_neg_distrib, ← smul_neg, neg_add_rev, neg_neg]
 
 /-- **Summation by parts bound.** If the partial sums of `e` are bounded by `C` and `f` is
 nonnegative and antitone, then every partial sum of `∑ₖ e k * f k` is bounded by `2 C f 0`. -/
@@ -151,15 +145,16 @@ noncomputable def abelSeries (s : ℂ) : ℂ :=
 
 variable {a q}
 
-/-- A variant of `norm_cpow_neg_sub_cpow_neg_le` for real bases `1 ≤ x ≤ y`, with any exponent
-`0 < δ ≤ re s` on the right-hand side. -/
+/-- For real `1 ≤ x ≤ y` and `0 < δ ≤ re s`,
+`‖x ^ (-s) - y ^ (-s)‖ ≤ ‖s‖ / δ · (x ^ (-δ) - y ^ (-δ))`. The proof writes both differences as
+integrals of `t ^ (-s - 1)` and `t ^ (-δ - 1)` over `[x, y]`. -/
 theorem norm_ofReal_cpow_neg_sub_cpow_neg_le {x y δ : ℝ} (hx : 1 ≤ x) (hxy : x ≤ y) {s : ℂ}
     (hδ : 0 < δ) (hδs : δ ≤ s.re) :
     ‖(x : ℂ) ^ (-s) - (y : ℂ) ^ (-s)‖ ≤ ‖s‖ / δ * (x ^ (-δ) - y ^ (-δ)) := by
   have h0 : (0 : ℝ) ∉ Set.uIcc x y := by
     rw [Set.uIcc_of_le hxy]
     exact fun h ↦ by linarith [h.1]
-  have hs0 : s ≠ 0 := fun h ↦ by simp [h] at hδs; linarith
+  have hs0 : s ≠ 0 := fun h ↦ by rw [h, Complex.zero_re] at hδs; linarith
   have hint : ∫ t in x..y, (t : ℂ) ^ (-s - 1) = ((y : ℂ) ^ (-s) - (x : ℂ) ^ (-s)) / (-s) := by
     rw [integral_cpow (Or.inr ⟨fun h ↦ hs0 (by linear_combination -h), h0⟩), sub_add_cancel]
   have hint' : ∫ t in x..y, t ^ (-δ - 1) = (y ^ (-δ) - x ^ (-δ)) / (-δ) := by
@@ -184,8 +179,8 @@ theorem norm_ofReal_cpow_neg_sub_cpow_neg_le {x y δ : ℝ} (hx : 1 ≤ x) (hxy 
       field_simp
       ring
 
-/-- The key estimate `‖q ^ (-s) - q' ^ (-s)‖ ≤ ‖s‖ / re s · (q ^ (-re s) - q' ^ (-re s))` for
-`0 < q ≤ q'` and `0 < re s`. -/
+/-- The estimate `‖m ^ (-s) - n ^ (-s)‖ ≤ ‖s‖ / re s · (m ^ (-re s) - n ^ (-re s))` for natural
+numbers `0 < m ≤ n` and `0 < re s`. -/
 theorem norm_cpow_neg_sub_cpow_neg_le {m n : ℕ} (hm : 0 < m) (hmn : m ≤ n) {s : ℂ}
     (hs : 0 < s.re) :
     ‖(m : ℂ) ^ (-s) - (n : ℂ) ^ (-s)‖ ≤ ‖s‖ / s.re * ((m : ℝ) ^ (-s.re) - (n : ℝ) ^ (-s.re)) := by
@@ -218,6 +213,8 @@ theorem norm_abelSeries_term_le {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n, a j
   rw [norm_mul, mul_assoc]
   exact mul_le_mul (ha _) h (norm_nonneg _) ((norm_nonneg _).trans (ha 0))
 
+/-- For bounded partial sums of `a` and `0 < re s`, the series defining `abelSeries a q s`
+converges. -/
 theorem summable_abelSeries {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n, a j‖ ≤ C) (hq₀ : 0 < q 0)
     (hq : StrictMono q) {s : ℂ} (hs : 0 < s.re) :
     Summable fun k : ℕ ↦
@@ -226,6 +223,8 @@ theorem summable_abelSeries {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n, a j‖ 
     fun _ ↦ Real.rpow_nonneg (Nat.cast_nonneg _) _).mul_left (C * (‖s‖ / s.re)))
     fun k ↦ norm_abelSeries_term_le ha hq₀ hq hs le_rfl k
 
+/-- For bounded partial sums of `a`, the Abel series is holomorphic on the half-plane
+`0 < re s`. -/
 theorem differentiableOn_abelSeries {C : ℝ} (ha : ∀ n, ‖∑ j ∈ range n, a j‖ ≤ C) (hq₀ : 0 < q 0)
     (hq : StrictMono q) : DifferentiableOn ℂ (abelSeries a q) {s : ℂ | 0 < s.re} := by
   intro s₀ hs₀

@@ -3,11 +3,9 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Data.Nat.Nth
-import Mathlib.NumberTheory.Real.Irrational
 import Mathlib.NumberTheory.LegendreSymbol.ZModChar
 import Mathlib.NumberTheory.PrimeCounting
+import RokickiConstant.BinaryExpansion
 
 /-!
 # Rokicki's constant
@@ -27,6 +25,9 @@ Tom Rokicki observed that `aₙ / 2 ^ (n - 1)` converges, and `ρ` is its limit.
   odd prime `Nat.nth Nat.Prime (k + 1)` is `3` modulo `4` and `0` otherwise.
 * `Real.rokickiConstant`: Rokicki's constant `ρ = ∑ₖ rokickiDigit k / 2 ^ (k + 1)`, with scoped
   notation `ρ` in the `RokickiConstant` namespace.
+* `Real.oeisA362583 n`: the integer with binary digits `rokickiDigit 0, …, rokickiDigit (n - 1)`,
+  that is, the term `A362583 (n + 1)` of the OEIS sequence.
+* `RokickiConstant.oddPrime k`: the `k`-th odd prime `pₖ₊₂`, counting from `oddPrime 0 = 3`.
 
 ## Main statements
 
@@ -72,44 +73,34 @@ private theorem odd_nth_prime_succ (k : ℕ) : Odd (Nat.nth Nat.Prime (k + 1)) :
   exact Nat.nth_injective Nat.infinite_setOfPred_prime h
 
 private theorem nth_prime_succ_mod_four (k : ℕ) :
-    Nat.nth Nat.Prime (k + 1) % 4 = 1 ∨ Nat.nth Nat.Prime (k + 1) % 4 = 3 := by
-  have := Nat.odd_iff.mp (odd_nth_prime_succ k)
-  omega
+    Nat.nth Nat.Prime (k + 1) % 4 = 1 ∨ Nat.nth Nat.Prime (k + 1) % 4 = 3 :=
+  Nat.odd_mod_four_iff.mp (Nat.odd_iff.mp (odd_nth_prime_succ k))
 
-/-- The geometric series `∑ₖ 1 / 2 ^ (k + 1)` sums to `1`. -/
-private theorem hasSum_one_div_two_pow_succ :
-    HasSum (fun k : ℕ ↦ (1 : ℝ) / 2 ^ (k + 1)) 1 := by
-  convert hasSum_geometric_two' 1 using 1
-  ext k
-  ring
-
+/-- The digits of Rokicki's constant are binary digits. -/
 theorem rokickiDigit_le_one (k : ℕ) : rokickiDigit k ≤ 1 := by
-  unfold rokickiDigit
+  rw [rokickiDigit]
   split_ifs <;> simp
 
 theorem rokickiDigit_eq_one_iff {k : ℕ} :
     rokickiDigit k = 1 ↔ Nat.nth Nat.Prime (k + 1) % 4 = 3 := by
-  unfold rokickiDigit
+  rw [rokickiDigit]
   split_ifs with h <;> simp [h]
 
 theorem rokickiDigit_eq_zero_iff {k : ℕ} :
     rokickiDigit k = 0 ↔ Nat.nth Nat.Prime (k + 1) % 4 = 1 := by
-  unfold rokickiDigit
+  rw [rokickiDigit]
   have := nth_prime_succ_mod_four k
-  split_ifs with h <;> simp <;> omega
+  split_ifs with h <;> simp only [false_iff, true_iff] <;> omega
 
+/-- The series defining Rokicki's constant converges. -/
 theorem summable_rokickiDigit_div_two_pow :
     Summable fun k : ℕ ↦ (rokickiDigit k : ℝ) / 2 ^ (k + 1) := by
-  refine .of_nonneg_of_le (fun k ↦ by positivity) (fun k ↦ ?_) hasSum_one_div_two_pow_succ.summable
-  gcongr
-  exact_mod_cast rokickiDigit_le_one k
+  simpa only [zero_add] using summable_binaryTail rokickiDigit_le_one 0
 
+/-- Rokicki's constant lies in `[0, 1]`. -/
 theorem rokickiConstant_mem_Icc : rokickiConstant ∈ Set.Icc (0 : ℝ) 1 := by
-  refine ⟨tsum_nonneg fun k ↦ by positivity, ?_⟩
-  refine (summable_rokickiDigit_div_two_pow.tsum_le_tsum (fun k ↦ ?_)
-    hasSum_one_div_two_pow_succ.summable).trans_eq hasSum_one_div_two_pow_succ.tsum_eq
-  gcongr
-  exact_mod_cast rokickiDigit_le_one k
+  rw [rokickiConstant, ← binaryTail_zero]
+  exact binaryTail_mem_Icc rokickiDigit_le_one 0
 
 /-- The integer whose binary digits are `rokickiDigit 0, …, rokickiDigit (n - 1)`. This is the
 term `A362583 (n + 1)` of the OEIS sequence, whose offset is `2`. -/
@@ -139,9 +130,13 @@ open Real
 numbering of the primes. -/
 noncomputable def oddPrime (k : ℕ) : ℕ := Nat.nth Nat.Prime (k + 1)
 
-theorem oddPrime_prime (k : ℕ) : (oddPrime k).Prime :=
+theorem prime_oddPrime (k : ℕ) : (oddPrime k).Prime :=
   Nat.prime_nth_prime _
 
+theorem oddPrime_pos (k : ℕ) : 0 < oddPrime k :=
+  (prime_oddPrime k).pos
+
+/-- The odd primes are enumerated in increasing order. -/
 theorem oddPrime_strictMono : StrictMono oddPrime := fun _ _ h ↦
   Nat.nth_strictMono Nat.infinite_setOfPred_prime (Nat.succ_lt_succ h)
 
@@ -151,9 +146,11 @@ theorem oddPrime_zero : oddPrime 0 = 3 :=
 theorem odd_oddPrime (k : ℕ) : Odd (oddPrime k) :=
   odd_nth_prime_succ k
 
+/-- Every odd prime is `1` or `3` modulo `4`. -/
 theorem oddPrime_mod_four (k : ℕ) : oddPrime k % 4 = 1 ∨ oddPrime k % 4 = 3 :=
   nth_prime_succ_mod_four k
 
+/-- The `k`-th odd prime is at least `k + 2`. -/
 theorem add_two_le_oddPrime (k : ℕ) : k + 2 ≤ oddPrime k :=
   (Nat.le_succ _).trans (Nat.add_two_le_nth_prime (k + 1))
 

@@ -33,19 +33,17 @@ Rokicki's constant, irrational, primes modulo 4, Dirichlet character
 set_option doc.verso true
 set_option doc.verso.suggestions false
 
-open Finset Function
+open Function
 
 namespace Real
 
 open RokickiConstant
 
 /-- **Rokicki's constant is irrational.** -/
-theorem irrational_rokickiConstant : Irrational rokickiConstant := by
+theorem irrational_rokickiConstant : Irrational ρ := by
   refine irrational_tsum_div_two_pow rokickiDigit_le_one fun p hp hd ↦ ?_
-  have ha : EventuallyPeriodic (fun k ↦ ZMod.χ₄ (oddPrime k)) p := by
-    unfold EventuallyPeriodic at hd ⊢
-    filter_upwards [hd] with n hn
-    rw [χ₄_oddPrime, χ₄_oddPrime, hn]
+  have ha : EventuallyPeriodic (fun k ↦ ZMod.χ₄ (oddPrime k)) p :=
+    hd.mono fun n hn ↦ by simp only [χ₄_oddPrime, hn]
   obtain ⟨c, C, hC⟩ := ha.exists_abs_sum_sub_mul_le hp
   by_cases hc : (c : ℝ) = 0
   · exact not_exists_abs_sum_chi4_le ⟨C, fun n ↦ by simpa [hc] using hC n⟩

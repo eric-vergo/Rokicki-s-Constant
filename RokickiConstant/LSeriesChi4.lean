@@ -39,6 +39,7 @@ The consequences for the partial sums of `χ₄` over the primes are drawn in
 * `RokickiConstant.exp_primePart_add_primePowerPart`: the Euler product in the form above.
 * `RokickiConstant.differentiableOn_primePowerPart`: `primePowerPart` is holomorphic on
   `re s > 1 / 2`.
+* `RokickiConstant.exists_norm_primePowerPart_le`: `primePowerPart` is bounded on `re s ≥ 1`.
 * `RokickiConstant.tendsto_re_primePowerPart`: `re (primePowerPart σ) → +∞` as `σ → 1 / 2⁺`.
 * `RokickiConstant.tendsto_tsum_oddPrime_rpow_neg`: `∑ₖ pₖ₊₂ ^ (-σ) → +∞` as `σ → 1⁺`.
 
@@ -60,22 +61,27 @@ open Real
 `n ≡ 1 (mod 4)`, `-1` if `n ≡ 3 (mod 4)`, and `0` for even `n`. -/
 noncomputable def chi4 : DirichletCharacter ℂ 4 := ZMod.χ₄.ringHomComp (Int.castRingHom ℂ)
 
+/-- On natural numbers, `chi4` is the cast of `ZMod.χ₄`. -/
 theorem chi4_natCast (n : ℕ) : chi4 n = (ZMod.χ₄ n : ℂ) := by
   simp [chi4, MulChar.ringHomComp_apply]
 
+/-- `chi4` is not the trivial character. -/
 theorem chi4_ne_one : chi4 ≠ 1 := by
   refine (MulChar.ringHomComp_ne_one_iff Int.cast_injective).mpr ?_
   exact MulChar.ne_one_iff.mpr ⟨-1, by decide⟩
 
+/-- The digits of Rokicki's constant in terms of `chi4`: `chi4 pₖ₊₂ = 1 - 2 · rokickiDigit k`. -/
 theorem chi4_oddPrime (k : ℕ) : chi4 (oddPrime k) = 1 - 2 * (rokickiDigit k : ℂ) := by
   rw [chi4_natCast, χ₄_oddPrime]
   push_cast
   ring
 
+/-- `chi4` squares to `1` at the odd primes. -/
 theorem chi4_oddPrime_sq (k : ℕ) : chi4 (oddPrime k) ^ 2 = 1 := by
   rcases Nat.le_one_iff_eq_zero_or_eq_one.mp (rokickiDigit_le_one k) with h | h <;>
     norm_num [chi4_oddPrime, h]
 
+/-- `chi4` has norm `1` at the odd primes. -/
 theorem norm_chi4_oddPrime (k : ℕ) : ‖chi4 (oddPrime k)‖ = 1 := by
   rcases Nat.le_one_iff_eq_zero_or_eq_one.mp (rokickiDigit_le_one k) with h | h <;>
     norm_num [chi4_oddPrime, h]
@@ -93,13 +99,14 @@ private noncomputable def primesEquiv : ℕ ≃ Nat.Primes :=
 
 /-- A sum over all primes splits as the term at `2` plus a sum over the odd primes. -/
 theorem tsum_primes_eq_add_tsum_oddPrime {F : Nat.Primes → ℂ} (hF : Summable F) :
-    ∑' p : Nat.Primes, F p = F ⟨2, Nat.prime_two⟩ + ∑' k : ℕ, F ⟨oddPrime k, oddPrime_prime k⟩ := by
+    ∑' p : Nat.Primes, F p = F ⟨2, Nat.prime_two⟩ + ∑' k : ℕ, F ⟨oddPrime k, prime_oddPrime k⟩ := by
   rw [← primesEquiv.tsum_eq]
   refine ((primesEquiv.summable_iff.mpr hF).tsum_eq_zero_add).trans ?_
   have h0 : primesEquiv 0 = ⟨2, Nat.prime_two⟩ := Subtype.ext Nat.nth_prime_zero_eq_two
   rw [Function.comp_apply, h0]
   rfl
 
+/-- The sum of the reciprocals of the odd primes diverges. -/
 theorem not_summable_oddPrime_inv : ¬ Summable fun k : ℕ ↦ ((oddPrime k : ℝ))⁻¹ := by
   intro h
   apply Nat.Primes.not_summable_one_div
@@ -107,20 +114,21 @@ theorem not_summable_oddPrime_inv : ¬ Summable fun k : ℕ ↦ ((oddPrime k : �
   refine (summable_nat_add_iff 1).mp (h.congr fun k ↦ ?_)
   exact (one_div _).symm
 
-private theorem pos_oddPrime (k : ℕ) : (0 : ℝ) < oddPrime k := by
-  exact_mod_cast (oddPrime_prime k).pos
+private theorem cast_oddPrime_pos (k : ℕ) : (0 : ℝ) < oddPrime k := by
+  exact_mod_cast oddPrime_pos k
 
-private theorem one_le_oddPrime (k : ℕ) : (1 : ℝ) ≤ oddPrime k := by
-  exact_mod_cast (oddPrime_prime k).one_lt.le
+private theorem one_le_cast_oddPrime (k : ℕ) : (1 : ℝ) ≤ oddPrime k := by
+  exact_mod_cast (prime_oddPrime k).one_lt.le
 
-private theorem three_le_oddPrime (k : ℕ) : (3 : ℝ) ≤ oddPrime k := by
+private theorem three_le_cast_oddPrime (k : ℕ) : (3 : ℝ) ≤ oddPrime k := by
   exact_mod_cast oddPrime_zero ▸ oddPrime_strictMono.monotone (Nat.zero_le k)
 
+/-- The series `∑ₖ pₖ₊₂ ^ r` converges for `r < -1`. -/
 theorem summable_oddPrime_rpow {r : ℝ} (hr : r < -1) :
     Summable fun k : ℕ ↦ (oddPrime k : ℝ) ^ r := by
   have h2 : Summable fun k : ℕ ↦ ((k + 2 : ℕ) : ℝ) ^ r :=
     (summable_nat_add_iff 2 (f := fun n : ℕ ↦ (n : ℝ) ^ r)).mpr (Real.summable_nat_rpow.mpr hr)
-  refine Summable.of_nonneg_of_le (fun k ↦ (Real.rpow_pos_of_pos (pos_oddPrime k) _).le)
+  refine Summable.of_nonneg_of_le (fun k ↦ (Real.rpow_pos_of_pos (cast_oddPrime_pos k) _).le)
     (fun k ↦ ?_) h2
   exact Real.rpow_le_rpow_of_nonpos (by positivity) (by exact_mod_cast add_two_le_oddPrime k)
     (by linarith)
@@ -129,20 +137,20 @@ theorem summable_oddPrime_rpow {r : ℝ} (hr : r < -1) :
 theorem tendsto_tsum_oddPrime_rpow_neg :
     Tendsto (fun σ : ℝ ↦ ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ)) (𝓝[>] (1 : ℝ)) atTop := by
   have hdiv := (not_summable_iff_tendsto_nat_atTop_of_nonneg
-    (fun k ↦ inv_nonneg.mpr (pos_oddPrime k).le)).mp not_summable_oddPrime_inv
+    (fun k ↦ inv_nonneg.mpr (cast_oddPrime_pos k).le)).mp not_summable_oddPrime_inv
   refine tendsto_atTop.mpr fun M ↦ ?_
   obtain ⟨N, hN⟩ := (tendsto_atTop.mp hdiv (M + 1)).exists
   have hcont : Tendsto (fun σ : ℝ ↦ ∑ k ∈ range N, (oddPrime k : ℝ) ^ (-σ)) (𝓝 1)
       (𝓝 (∑ k ∈ range N, (oddPrime k : ℝ)⁻¹)) := by
     refine tendsto_finsetSum _ fun k _ ↦ ?_
-    have := (Real.continuousAt_const_rpow (b := -1) (pos_oddPrime k).ne').tendsto.comp
+    have := (Real.continuousAt_const_rpow (b := -1) (cast_oddPrime_pos k).ne').tendsto.comp
       (tendsto_neg (1 : ℝ))
     simpa [Function.comp_def, Real.rpow_neg_one] using this
   have hev : ∀ᶠ σ in 𝓝 (1 : ℝ), M < ∑ k ∈ range N, (oddPrime k : ℝ) ^ (-σ) :=
     hcont.eventually (lt_mem_nhds (by linarith))
   filter_upwards [nhdsWithin_le_nhds hev, self_mem_nhdsWithin] with σ hσ hσ1
   refine hσ.le.trans (Summable.sum_le_tsum _
-    (fun k _ ↦ (Real.rpow_pos_of_pos (pos_oddPrime k) _).le) ?_)
+    (fun k _ ↦ (Real.rpow_pos_of_pos (cast_oddPrime_pos k) _).le) ?_)
   exact summable_oddPrime_rpow (by rw [Set.mem_Ioi] at hσ1; linarith)
 
 section EulerProduct
@@ -157,10 +165,11 @@ noncomputable def primePowerPart (s : ℂ) : ℂ :=
   ∑' k : ℕ, ∑' m : ℕ,
     chi4 (oddPrime k) ^ (m + 2) * ((oddPrime k : ℂ) ^ (-s)) ^ (m + 2) / (m + 2)
 
+/-- For `0 < re s`, every odd prime `p` satisfies `‖p ^ (-s)‖ < 1`. -/
 theorem norm_oddPrime_cpow_neg_lt_one {k : ℕ} {s : ℂ} (hs : 0 < s.re) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ < 1 := by
-  rw [Complex.norm_natCast_cpow_of_pos (oddPrime_prime k).pos]
-  exact Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast (oddPrime_prime k).one_lt)
+  rw [Complex.norm_natCast_cpow_of_pos (oddPrime_pos k)]
+  exact Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast (prime_oddPrime k).one_lt)
     (by simpa using hs)
 
 /-- The tail `∑' m : ℕ, z ^ (m + 2) / (m + 2)` of the Taylor series of `-log (1 - z)` equals
@@ -175,7 +184,7 @@ theorem hasSum_pow_add_two_div {z : ℂ} (hz : ‖z‖ < 1) :
   ring
 
 /-- The Taylor expansion `-log (1 - z) = z + ∑_{m ≥ 2} z ^ m / m` at `z = χ₄ p · p ^ (-s)`. -/
-theorem neg_log_one_sub_eq (k : ℕ) {s : ℂ} (hs : 0 < s.re) :
+theorem neg_log_one_sub_chi4_mul_cpow_neg (k : ℕ) {s : ℂ} (hs : 0 < s.re) :
     -log (1 - chi4 (oddPrime k) * (oddPrime k : ℂ) ^ (-s)) =
       chi4 (oddPrime k) * (oddPrime k : ℂ) ^ (-s) +
         ∑' m : ℕ, chi4 (oddPrime k) ^ (m + 2) * ((oddPrime k : ℂ) ^ (-s)) ^ (m + 2) / (m + 2) := by
@@ -187,10 +196,11 @@ theorem neg_log_one_sub_eq (k : ℕ) {s : ℂ} (hs : 0 < s.re) :
   rw [h.tsum_eq]
   ring
 
+/-- The series defining `primePart s` converges for `1 < re s`. -/
 theorem summable_primePart {s : ℂ} (hs : 1 < s.re) :
     Summable fun k : ℕ ↦ chi4 (oddPrime k) * (oddPrime k : ℂ) ^ (-s) :=
   summable_mul_cpow_neg (C := 1) (fun k ↦ (norm_chi4_oddPrime k).le)
-    (by rw [oddPrime_zero]; norm_num) oddPrime_strictMono hs
+    (oddPrime_pos 0) oddPrime_strictMono hs
 
 /-- Termwise bound for the series `∑' m : ℕ, w ^ (m + n) / (m + n)` when `2 ≤ n`. -/
 private theorem norm_pow_add_div_le (w : ℂ) {n : ℕ} (hn : 2 ≤ n) (m : ℕ) :
@@ -228,10 +238,10 @@ private theorem norm_tsum_pow_add_div_le {w : ℂ} (hw : ‖w‖ ≤ 3 / 4) {n :
 
 private theorem norm_oddPrime_cpow_rpow (k : ℕ) (s : ℂ) (a : ℝ) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ ^ a = (oddPrime k : ℝ) ^ (-(a * s.re)) := by
-  rw [Complex.norm_natCast_cpow_of_pos (oddPrime_prime k).pos, ← Real.rpow_mul
-    (pos_oddPrime k).le]
+  rw [Complex.norm_natCast_cpow_of_pos (oddPrime_pos k), ← Real.rpow_mul
+    (cast_oddPrime_pos k).le]
   congr 1
-  simp
+  rw [Complex.neg_re]
   ring
 
 private theorem norm_oddPrime_cpow_sq (k : ℕ) (s : ℂ) :
@@ -243,11 +253,11 @@ private theorem norm_oddPrime_cpow_sq (k : ℕ) (s : ℂ) :
 private theorem norm_oddPrime_cpow_le {k : ℕ} {s : ℂ} (hs : 1 / 2 < s.re) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ ≤ 3 / 4 := by
   have h1 : (oddPrime k : ℝ) ^ (-2 * s.re) ≤ (oddPrime k : ℝ) ^ (-1 : ℝ) :=
-    Real.rpow_le_rpow_of_exponent_le (one_le_oddPrime k) (by linarith)
+    Real.rpow_le_rpow_of_exponent_le (one_le_cast_oddPrime k) (by linarith)
   rw [Real.rpow_neg_one] at h1
   have h2 : (oddPrime k : ℝ)⁻¹ ≤ 1 / 3 := by
     rw [one_div]
-    exact inv_anti₀ (by norm_num) (three_le_oddPrime k)
+    exact inv_anti₀ (by norm_num) (three_le_cast_oddPrime k)
   have h3 := norm_oddPrime_cpow_sq k s
   nlinarith [norm_nonneg ((oddPrime k : ℂ) ^ (-s))]
 
@@ -268,6 +278,7 @@ private theorem summable_norm_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
   Summable.of_nonneg_of_le (fun _ ↦ norm_nonneg _) (fun k ↦ norm_tsum_primePowerPart_le k hs)
     ((summable_oddPrime_rpow (by linarith)).mul_left 2)
 
+/-- The series defining `primePowerPart s` converges for `1 / 2 < re s`. -/
 theorem summable_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
     Summable fun k : ℕ ↦
       ∑' m : ℕ, chi4 (oddPrime k) ^ (m + 2) * ((oddPrime k : ℂ) ^ (-s)) ^ (m + 2) / (m + 2) :=
@@ -286,7 +297,7 @@ theorem exp_primePart_add_primePowerPart {s : ℂ} (hs : 1 < s.re) :
   rw [tsum_primes_eq_add_tsum_oddPrime hsum]
   have h0 : 0 < s.re := by linarith
   simp only [Nat.cast_ofNat, chi4_two, zero_mul, sub_zero, Complex.log_one, neg_zero, zero_add,
-    neg_log_one_sub_eq _ h0]
+    neg_log_one_sub_chi4_mul_cpow_neg _ h0]
   rw [(summable_primePart hs).tsum_add (summable_primePowerPart (by linarith))]
   rfl
 
@@ -301,12 +312,12 @@ private theorem differentiableOn_primePowerPart_of_lt {σ₀ : ℝ} (hσ₀ : 1 
     exact norm_oddPrime_cpow_neg_lt_one (by linarith)
   have hzd : ∀ k s, DifferentiableAt ℂ (z k) s := fun k s ↦
     ((differentiableAt_id.neg).const_cpow
-      (Or.inl (by exact_mod_cast (oddPrime_prime k).ne_zero))).const_mul _
+      (Or.inl (by exact_mod_cast (prime_oddPrime k).ne_zero))).const_mul _
   have heq : Set.EqOn primePowerPart (fun s ↦ ∑' k, (-log (1 - z k s) - z k s))
       {s : ℂ | σ₀ < s.re} := fun s hs ↦ by
     simp only [Set.mem_ofPred_eq] at hs
     refine tsum_congr fun k ↦ ?_
-    simp only [z, neg_log_one_sub_eq k (by linarith : 0 < s.re)]
+    simp only [z, neg_log_one_sub_chi4_mul_cpow_neg k (by linarith : 0 < s.re)]
     ring
   refine DifferentiableOn.congr ?_ heq
   refine differentiableOn_tsum_of_summable_norm
@@ -317,11 +328,12 @@ private theorem differentiableOn_primePowerPart_of_lt {σ₀ : ℝ} (hσ₀ : 1 
         (by rw [norm_neg]; exact hz k s hs)
     exact ((((hzd k s).const_sub 1).clog hmem).neg.sub (hzd k s)).differentiableWithinAt
   · simp only [Set.mem_ofPred_eq] at hs
-    simp only [z, neg_log_one_sub_eq k (by linarith : 0 < s.re), add_sub_cancel_left]
+    simp only [z, neg_log_one_sub_chi4_mul_cpow_neg k (by linarith : 0 < s.re), add_sub_cancel_left]
     refine (norm_tsum_primePowerPart_le k (by linarith)).trans ?_
     exact mul_le_mul_of_nonneg_left
-      (Real.rpow_le_rpow_of_exponent_le (one_le_oddPrime k) (by linarith)) zero_le_two
+      (Real.rpow_le_rpow_of_exponent_le (one_le_cast_oddPrime k) (by linarith)) zero_le_two
 
+/-- `primePowerPart` is holomorphic on the half-plane `1 / 2 < re s`. -/
 theorem differentiableOn_primePowerPart :
     DifferentiableOn ℂ primePowerPart {s : ℂ | 1 / 2 < s.re} := by
   intro s hs
@@ -344,7 +356,7 @@ theorem exists_norm_primePowerPart_le : ∃ M : ℝ, ∀ s : ℂ, 1 ≤ s.re →
   refine (summable_norm_primePowerPart hs').tsum_le_tsum (fun k ↦ ?_) hsum
   refine (norm_tsum_primePowerPart_le k hs').trans ?_
   exact mul_le_mul_of_nonneg_left
-    (Real.rpow_le_rpow_of_exponent_le (one_le_oddPrime k) (by linarith)) zero_le_two
+    (Real.rpow_le_rpow_of_exponent_le (one_le_cast_oddPrime k) (by linarith)) zero_le_two
 
 /-- For `‖w‖ ≤ 3 / 4`, the real part of `∑' m : ℕ, w ^ (m + 2) / (m + 2)` is at least
 `(w ^ 2 / 2).re - 2 * ‖w‖ ^ 3`. -/
@@ -380,7 +392,7 @@ theorem le_re_primePowerPart {σ : ℝ} (hσ : 1 / 2 < σ) :
     simp_rw [hw_def, mul_pow] at h
     rw [← hw_def] at h
     have hz : (oddPrime k : ℂ) ^ (-(σ : ℂ)) = (((oddPrime k : ℝ) ^ (-σ) : ℝ) : ℂ) := by
-      rw [Complex.ofReal_cpow (pos_oddPrime k).le]
+      rw [Complex.ofReal_cpow (cast_oddPrime_pos k).le]
       push_cast
       rfl
     have hre : (chi4 (oddPrime k) ^ 2 * ((oddPrime k : ℂ) ^ (-(σ : ℂ))) ^ 2 / 2).re =
@@ -390,13 +402,13 @@ theorem le_re_primePowerPart {σ : ℝ} (hσ : 1 / 2 < σ) :
         push_cast
         ring
       rw [chi4_oddPrime_sq, one_mul, hz, h4, Complex.ofReal_re, ← Real.rpow_natCast,
-        ← Real.rpow_mul (pos_oddPrime k).le]
+        ← Real.rpow_mul (cast_oddPrime_pos k).le]
       congr 2
       push_cast
       ring
     have h3 : ‖w‖ ^ 3 ≤ (oddPrime k : ℝ) ^ (-3 / 2 : ℝ) := by
       rw [hnw, ← Real.rpow_natCast, norm_oddPrime_cpow_rpow]
-      refine Real.rpow_le_rpow_of_exponent_le (one_le_oddPrime k) ?_
+      refine Real.rpow_le_rpow_of_exponent_le (one_le_cast_oddPrime k) ?_
       simp only [Complex.ofReal_re]
       push_cast
       linarith

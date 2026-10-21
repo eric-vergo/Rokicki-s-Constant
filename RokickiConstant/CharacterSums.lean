@@ -3,7 +3,6 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.Analysis.Analytic.Uniqueness
 import RokickiConstant.LSeriesChi4
 
 /-!
@@ -20,13 +19,13 @@ Both statements come from the Euler product
 (`RokickiConstant.exp_primePart_add_primePowerPart`).
 
 * If `S n = c · n + O(1)` with `c ≠ 0`, summation by parts gives
-  `primePart σ = c ∑_p p^{-σ} + O(1)` for real `σ > 1`, which tends to `±∞` as `σ → 1⁺`
-  because `∑_p 1 / p` diverges, while `primePowerPart` stays bounded. So `L(σ, χ₄) → 0` or
+  `re (primePart σ) = c ∑_p p^{-σ} + O(1)` for real `σ > 1`, which tends to `±∞` as `σ → 1⁺`
+  because `∑_p 1 / p` diverges, while `primePowerPart` stays bounded. So `‖L(σ, χ₄)‖ → 0` or
   `∞`, contradicting `L(1, χ₄) ≠ 0` and the continuity of `L(·, χ₄)` at `1`.
 * If `S n` is bounded, summation by parts (`abelSeries`) continues `primePart` holomorphically to
   `re s > 0`, and `primePowerPart` is holomorphic on `re s > 1 / 2`; by the identity theorem
   `L(s, χ₄) = exp (abelSeries s + primePowerPart s)` on `re s > 1 / 2`. But the real part of
-  `primePowerPart σ` tends to `+∞` as `σ → 1 / 2⁺`, so `|L(σ, χ₄)| → ∞`, contradicting the
+  `primePowerPart σ` tends to `+∞` as `σ → 1 / 2⁺`, so `‖L(σ, χ₄)‖ → ∞`, contradicting the
   continuity of the entire function `L(·, χ₄)` at `1 / 2`.
 
 Neither argument uses the prime number theorem, nor Dirichlet's theorem on primes in
@@ -34,6 +33,10 @@ arithmetic progressions.
 
 ## Main statements
 
+* `RokickiConstant.abs_re_primePart_sub_mul_tsum_le`: summation by parts for `primePart` under
+  `S n = c · n + O(1)`.
+* `RokickiConstant.exp_abelSeries_add_primePowerPart`: under bounded `S n`, the Euler product
+  continues to `re s > 1 / 2`.
 * `RokickiConstant.not_exists_abs_sum_chi4_sub_mul_le`: the partial sums of `χ₄` over the odd
   primes are not `c · n + O(1)` with `c ≠ 0`.
 * `RokickiConstant.not_exists_abs_sum_chi4_le`: the partial sums of `χ₄` over the odd primes are
@@ -51,7 +54,13 @@ open Filter Topology Finset Complex
 
 namespace RokickiConstant
 
-open Real
+/-- `‖L(σ, χ₄)‖ → ‖L(x, χ₄)‖` as `σ → x⁺` along the reals, since `L(·, χ₄)` is entire. -/
+theorem tendsto_norm_LFunction_chi4 (x : ℝ) :
+    Tendsto (fun σ : ℝ ↦ ‖DirichletCharacter.LFunction chi4 σ‖) (𝓝[>] x)
+      (𝓝 ‖DirichletCharacter.LFunction chi4 x‖) :=
+  tendsto_nhdsWithin_of_tendsto_nhds
+    (((DirichletCharacter.differentiable_LFunction chi4_ne_one).continuous.comp
+      Complex.continuous_ofReal).norm.tendsto x)
 
 section Linear
 
@@ -60,7 +69,6 @@ section Linear
 theorem abs_re_primePart_sub_mul_tsum_le {c C : ℝ}
     (h : ∀ n, |(∑ k ∈ range n, (ZMod.χ₄ (oddPrime k) : ℝ)) - c * n| ≤ C) {σ : ℝ} (hσ : 1 < σ) :
     |(primePart σ).re - c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ)| ≤ 2 * C := by
-  have hq₀ : 0 < oddPrime 0 := by rw [oddPrime_zero]; norm_num
   have hσ' : 1 < (σ : ℂ).re := by simpa using hσ
   have hfs : Summable fun k ↦ (oddPrime k : ℝ) ^ (-σ) := summable_oddPrime_rpow (by linarith)
   have hterm : ∀ k, (chi4 (oddPrime k) * (oddPrime k : ℂ) ^ (-(σ : ℂ))).re =
@@ -88,17 +96,10 @@ theorem abs_re_primePart_sub_mul_tsum_le {c C : ℝ}
   rw [key]
   calc _ ≤ 2 * C * (oddPrime 0 : ℝ) ^ (-σ) :=
         abs_tsum_mul_le_of_abs_sum_le he (fun _ ↦ Real.rpow_nonneg (Nat.cast_nonneg _) _)
-          (antitone_natCast_rpow_neg hq₀ oddPrime_strictMono (by linarith)) hes
+          (antitone_natCast_rpow_neg (oddPrime_pos 0) oddPrime_strictMono (by linarith)) hes
     _ ≤ 2 * C := mul_le_of_le_one_right (by linarith) hf0
 
-theorem tendsto_norm_LFunction_chi4_one :
-    Tendsto (fun σ : ℝ ↦ ‖DirichletCharacter.LFunction chi4 σ‖) (𝓝[>] (1 : ℝ))
-      (𝓝 ‖DirichletCharacter.LFunction chi4 1‖) := by
-  have h := ((DirichletCharacter.differentiable_LFunction chi4_ne_one).continuous.comp
-    Complex.continuous_ofReal).norm.tendsto 1
-  simp only [Function.comp_def, Complex.ofReal_one] at h
-  exact tendsto_nhdsWithin_of_tendsto_nhds h
-
+/-- `L(1, χ₄) ≠ 0`. -/
 theorem LFunction_chi4_one_ne_zero : DirichletCharacter.LFunction chi4 1 ≠ 0 :=
   DirichletCharacter.LFunction_apply_one_ne_zero chi4_ne_one
 
@@ -112,8 +113,10 @@ theorem not_exists_abs_sum_chi4_sub_mul_le :
       Real.exp ((primePart σ).re + (primePowerPart σ).re) := fun σ hσ ↦ by
     rw [← exp_primePart_add_primePowerPart (by simpa using hσ), Complex.norm_exp, Complex.add_re]
   have hP : ∀ σ : ℝ, 1 < σ → |(primePowerPart σ).re| ≤ M := fun σ hσ ↦
-    (Complex.abs_re_le_norm _).trans (hM _ (by simp; linarith))
+    (Complex.abs_re_le_norm _).trans (hM _ (by rw [Complex.ofReal_re]; linarith))
   have hev : ∀ᶠ σ in 𝓝[>] (1 : ℝ), 1 < σ := self_mem_nhdsWithin
+  have hL := tendsto_norm_LFunction_chi4 1
+  rw [Complex.ofReal_one] at hL
   rcases hc.lt_or_gt with hc | hc
   · have hlim : Tendsto
         (fun σ : ℝ ↦ Real.exp (c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ) + (2 * C + M)))
@@ -126,13 +129,13 @@ theorem not_exists_abs_sum_chi4_sub_mul_le :
         exact Real.exp_le_exp.2 (by linarith [(abs_le.1 (hP σ hσ)).2,
           (abs_le.1 (abs_re_primePart_sub_mul_tsum_le h hσ)).2])) hlim
     exact LFunction_chi4_one_ne_zero
-      (norm_eq_zero.1 (tendsto_nhds_unique tendsto_norm_LFunction_chi4_one h0))
+      (norm_eq_zero.1 (tendsto_nhds_unique hL h0))
   · have hlim : Tendsto
         (fun σ : ℝ ↦ Real.exp (c * ∑' k : ℕ, (oddPrime k : ℝ) ^ (-σ) + -(2 * C + M)))
         (𝓝[>] (1 : ℝ)) atTop :=
       Real.tendsto_exp_atTop.comp <| tendsto_atTop_add_const_right _ _ <|
         tendsto_tsum_oddPrime_rpow_neg.const_mul_atTop hc
-    refine not_tendsto_atTop_of_tendsto_nhds tendsto_norm_LFunction_chi4_one
+    refine not_tendsto_atTop_of_tendsto_nhds hL
       (tendsto_atTop_mono' _ (hev.mono fun σ hσ ↦ ?_) hlim)
     dsimp only
     rw [hnorm σ hσ]
@@ -161,12 +164,14 @@ theorem norm_sum_chi4_le (n : ℕ) : ‖∑ j ∈ range n, chi4 (oddPrime j)‖ 
 theorem abelSeries_eq_primePart {s : ℂ} (hs : 1 < s.re) :
     abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime s = primePart s := by
   rw [primePart]
-  exact abelSeries_eq_tsum (norm_sum_chi4_le hC) (by rw [oddPrime_zero]; norm_num)
+  exact abelSeries_eq_tsum (norm_sum_chi4_le hC) (oddPrime_pos 0)
     oddPrime_strictMono hs
 
+/-- Under bounded partial sums, the Abel series of `χ₄` over the odd primes is holomorphic on
+`0 < re s`. -/
 theorem differentiableOn_abelSeries_chi4 :
     DifferentiableOn ℂ (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime) {s : ℂ | 0 < s.re} :=
-  differentiableOn_abelSeries (norm_sum_chi4_le hC) (by rw [oddPrime_zero]; norm_num)
+  differentiableOn_abelSeries (norm_sum_chi4_le hC) (oddPrime_pos 0)
     oddPrime_strictMono
 
 /-- **Analytic continuation of the Euler product.** Under bounded partial sums,
@@ -190,6 +195,8 @@ theorem exp_abelSeries_add_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
   exact hf.eqOn_of_preconnected_of_eventuallyEq hg (convex_halfSpace_re_gt (1 / 2)).isPreconnected
     (show (1 / 2 : ℝ) < (2 : ℂ).re by norm_num) hfg hs
 
+/-- Under bounded partial sums, the real part of the Abel series of `χ₄` over the odd primes is
+continuous at `1 / 2` from the right. -/
 theorem tendsto_re_abelSeries_chi4 :
     Tendsto (fun σ : ℝ ↦ (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime σ).re)
       (𝓝[>] (1 / 2 : ℝ))
@@ -201,14 +208,6 @@ theorem tendsto_re_abelSeries_chi4 :
       (hU.mem_nhds (show 0 < ((1 / 2 : ℝ) : ℂ).re by norm_num))
   exact tendsto_nhdsWithin_of_tendsto_nhds (Complex.continuous_re.continuousAt.tendsto.comp
     (hcont.tendsto.comp (Complex.continuous_ofReal.tendsto _)))
-
-omit hC in
-theorem tendsto_norm_LFunction_chi4_one_half :
-    Tendsto (fun σ : ℝ ↦ ‖DirichletCharacter.LFunction chi4 σ‖) (𝓝[>] (1 / 2 : ℝ))
-      (𝓝 ‖DirichletCharacter.LFunction chi4 (1 / 2 : ℝ)‖) :=
-  tendsto_nhdsWithin_of_tendsto_nhds
-    (((DirichletCharacter.differentiable_LFunction chi4_ne_one).continuous.comp
-      Complex.continuous_ofReal).norm.tendsto (1 / 2 : ℝ))
 
 end Bounded
 
@@ -222,7 +221,7 @@ theorem not_exists_abs_sum_chi4_le :
     eventually_nhdsWithin_of_forall fun σ (hσ : 1 / 2 < σ) ↦ by
       rw [← exp_abelSeries_add_primePowerPart hC (by simpa using hσ), Complex.norm_exp,
         Complex.add_re]
-  exact not_tendsto_atTop_of_tendsto_nhds tendsto_norm_LFunction_chi4_one_half
+  exact not_tendsto_atTop_of_tendsto_nhds (tendsto_norm_LFunction_chi4 (1 / 2))
     ((Real.tendsto_exp_atTop.comp
       ((tendsto_re_abelSeries_chi4 hC).add_atTop tendsto_re_primePowerPart)).congr' hev)
 
