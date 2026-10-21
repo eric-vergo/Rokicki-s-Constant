@@ -42,6 +42,7 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
 | `Comparator/Challenge.lean` | the comparator as a challenge: `rho` defined directly from the specification and `theorem rho_irrational : Irrational rho := by sorry` |
 | `Comparator/Solution.lean` | the same file with the proof filled in, by identifying `rho` with `Real.rokickiConstant` |
+| `blueprint/` | the Verso blueprint: introduction, chapters, dependency graph |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
 
 ## Comparator
@@ -56,6 +57,18 @@ only in imports, docstring prose and the proof body, so `diff` on them is the au
 Complete: `lake build` (the development and the comparator solution) succeeds with no `sorry` and
 no warnings, and `#print axioms rho_irrational` reports only `propext`, `Classical.choice` and `Quot.sound`. `lake build ComparatorChallenge`
 elaborates the challenge alone and reports its one intentional `sorry`.
+
+## Blueprint
+
+The project has a [Verso blueprint](blueprint/README.md): an introduction, one chapter per file of
+the development, and a dependency graph whose nodes are linked to the Lean declarations and
+coloured by their formalization status. Build and serve it locally with
+
+```bash
+lake exe vbp build --serve
+```
+
+and open <http://localhost:8000>. The first build compiles Verso, which takes a few minutes.
 
 ## Building
 

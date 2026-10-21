@@ -10,6 +10,9 @@
 *.log
 .cache/
 
+# Verso blueprint output (`lake exe vbp build`)
+/_out/
+
 # Editor / OS
 .DS_Store
 .vscode/*

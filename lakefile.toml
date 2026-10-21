@@ -13,6 +13,17 @@ weak.linter.style.longLine = true
 doc.verso = true
 weak.doc.verso.suggestions = false
 
+# Verso Blueprint (https://github.com/leanprover/verso-blueprint), pinned to the head of its
+# `v4.34.0` release branch, whose `lean-toolchain` is `leanprover/lean4:v4.34.1`.
+# It pulls in Verso, SubVerso and verso-slides. Only used by the `RokickiBlueprint` library
+# and the `BlueprintMain.lean` generator; see `blueprint/README.md`.
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "a1cf70667112dcffe15faea9f8783e63dd9644e8"
+
+# Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
+# take precedence over VersoBlueprint's when Lake resolves the workspace.
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
@@ -28,3 +39,17 @@ roots = ["Comparator.Solution"]
 [[lean_lib]]
 name = "ComparatorChallenge"
 roots = ["Comparator.Challenge"]
+
+# The Verso blueprint document (not a default target: `lake build` does not build it).
+# Build the site with `lake exe vbp build`; see `blueprint/README.md`.
+[[lean_lib]]
+name = "RokickiBlueprint"
+srcDir = "blueprint"
+
+[lean_lib.leanOptions]
+experimental.module = true
+weak.linter.mathlibStandardSet = false
+# Blueprint directive lines (labels, Lean names, dependencies) are inherently long.
+weak.linter.style.longLine = false
+# Make a misspelled `(lean := "...")` declaration name an error rather than a warning.
+weak.verso.blueprint.externalCode.strictResolve = true
