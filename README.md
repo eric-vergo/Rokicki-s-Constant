@@ -35,6 +35,7 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
 | `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
 | `RokickiConstant/Irrational.lean` | the main theorem |
+| `RokickiConstant/Comparator.lean` | the specification restated independently (the series, the OEIS recurrence, the comparator statement `Irrational Real.rokickiConstant`), checked against the development |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
 
 ## Status

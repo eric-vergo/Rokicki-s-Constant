@@ -12,9 +12,7 @@ import RokickiConstant.BinaryExpansion
 
 Let `3 = p₂ < p₃ < p₄ < ⋯` be the odd primes in increasing order (so `p₁ = 2`). **Rokicki's
 constant** is the real number
-$$
-  ρ = \sum_{k ≥ 2} \frac{[p_k ≡ 3 \pmod 4]}{2^{k-1}} = 0.70040013796579773…,
-$$
+$$`\rho = \sum_{k \geq 2} \frac{[p_k \equiv 3 \pmod 4]}{2^{k-1}} = 0.70040013796579773\ldots,`
 whose binary expansion `0.1011001101…` records, prime by prime, whether `pₖ ≡ 3 (mod 4)`.
 The sequence OEIS A362583 lists the integers `aₙ` with binary digits `[p₂ ≡ 3], …, [pₙ ≡ 3]`;
 Tom Rokicki observed that `aₙ / 2 ^ (n - 1)` converges, and `ρ` is its limit.
@@ -40,7 +38,7 @@ The irrationality of `ρ` is proved in `RokickiConstant.Irrational`.
 
 ## References
 
-* OEIS A362583, <https://oeis.org/A362583>
+* [OEIS A362583](https://oeis.org/A362583)
 
 ## Tags
 
@@ -72,6 +70,7 @@ private theorem odd_nth_prime_succ (k : ℕ) : Odd (Nat.nth Nat.Prime (k + 1)) :
   rw [← Nat.nth_prime_zero_eq_two] at h
   exact Nat.nth_injective Nat.infinite_setOfPred_prime h
 
+/-- The primes after `2` are `1` or `3` modulo `4`. -/
 private theorem nth_prime_succ_mod_four (k : ℕ) :
     Nat.nth Nat.Prime (k + 1) % 4 = 1 ∨ Nat.nth Nat.Prime (k + 1) % 4 = 3 :=
   Nat.odd_mod_four_iff.mp (Nat.odd_iff.mp (odd_nth_prime_succ k))
@@ -81,11 +80,13 @@ theorem rokickiDigit_le_one (k : ℕ) : rokickiDigit k ≤ 1 := by
   rw [rokickiDigit]
   split_ifs <;> simp
 
+/-- The `k`-th digit of `ρ` is `1` iff the odd prime `pₖ₊₂` is `3` modulo `4`. -/
 theorem rokickiDigit_eq_one_iff {k : ℕ} :
     rokickiDigit k = 1 ↔ Nat.nth Nat.Prime (k + 1) % 4 = 3 := by
   rw [rokickiDigit]
   split_ifs with h <;> simp [h]
 
+/-- The `k`-th digit of `ρ` is `0` iff the odd prime `pₖ₊₂` is `1` modulo `4`. -/
 theorem rokickiDigit_eq_zero_iff {k : ℕ} :
     rokickiDigit k = 0 ↔ Nat.nth Nat.Prime (k + 1) % 4 = 1 := by
   rw [rokickiDigit]
@@ -130,9 +131,11 @@ open Real
 numbering of the primes. -/
 noncomputable def oddPrime (k : ℕ) : ℕ := Nat.nth Nat.Prime (k + 1)
 
+/-- `oddPrime k` is prime. -/
 theorem prime_oddPrime (k : ℕ) : (oddPrime k).Prime :=
   Nat.prime_nth_prime _
 
+/-- `oddPrime k` is positive. -/
 theorem oddPrime_pos (k : ℕ) : 0 < oddPrime k :=
   (prime_oddPrime k).pos
 
@@ -140,9 +143,11 @@ theorem oddPrime_pos (k : ℕ) : 0 < oddPrime k :=
 theorem oddPrime_strictMono : StrictMono oddPrime := fun _ _ h ↦
   Nat.nth_strictMono Nat.infinite_setOfPred_prime (Nat.succ_lt_succ h)
 
+/-- The first odd prime is `3`. -/
 theorem oddPrime_zero : oddPrime 0 = 3 :=
   Nat.nth_prime_one_eq_three
 
+/-- `oddPrime k` is odd. -/
 theorem odd_oddPrime (k : ℕ) : Odd (oddPrime k) :=
   odd_nth_prime_succ k
 

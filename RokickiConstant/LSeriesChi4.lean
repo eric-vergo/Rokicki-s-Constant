@@ -16,10 +16,8 @@ import RokickiConstant.PartialSums
 Let `χ₄` be the nontrivial Dirichlet character modulo `4`, so that `χ₄ p = 1` for primes
 `p ≡ 1 (mod 4)` and `χ₄ p = -1` for primes `p ≡ 3 (mod 4)`. Writing `3 = p₂ < p₃ < ⋯` for the
 odd primes, this file sets up the Euler product of `L(s, χ₄)` in the form
-$$
-  L(s, χ₄) = \exp\Big(\sum_p χ₄(p) p^{-s} + \sum_p \sum_{m ≥ 2} \frac{χ₄(p)^m p^{-ms}}{m}\Big),
-  \qquad \operatorname{re} s > 1,
-$$
+$$`L(s, \chi_4) = \exp\Big(\sum_p \chi_4(p) p^{-s}
+  + \sum_p \sum_{m \geq 2} \frac{\chi_4(p)^m p^{-ms}}{m}\Big), \qquad \operatorname{re} s > 1,`
 which Mathlib provides as `DirichletCharacter.LSeries_eulerProduct_exp_log`. The first sum is
 `primePart s`, the second `primePowerPart s`. We prove that `primePowerPart` is holomorphic on
 `re s > 1 / 2`, bounded on `re s ≥ 1`, and that its real part tends to `+∞` as `s → 1 / 2⁺`
@@ -86,6 +84,7 @@ theorem norm_chi4_oddPrime (k : ℕ) : ‖chi4 (oddPrime k)‖ = 1 := by
   rcases Nat.le_one_iff_eq_zero_or_eq_one.mp (rokickiDigit_le_one k) with h | h <;>
     norm_num [chi4_oddPrime, h]
 
+/-- `chi4` vanishes at `2`. -/
 theorem chi4_two : chi4 2 = 0 := by
   simp only [chi4, MulChar.ringHomComp_apply]
   rw [show ZMod.χ₄ 2 = 0 by decide]
@@ -114,12 +113,15 @@ theorem not_summable_oddPrime_inv : ¬ Summable fun k : ℕ ↦ ((oddPrime k : �
   refine (summable_nat_add_iff 1).mp (h.congr fun k ↦ ?_)
   exact (one_div _).symm
 
+/-- `oddPrime k` is positive as a real number. -/
 private theorem cast_oddPrime_pos (k : ℕ) : (0 : ℝ) < oddPrime k := by
   exact_mod_cast oddPrime_pos k
 
+/-- `oddPrime k` is at least `1` as a real number. -/
 private theorem one_le_cast_oddPrime (k : ℕ) : (1 : ℝ) ≤ oddPrime k := by
   exact_mod_cast (prime_oddPrime k).one_lt.le
 
+/-- `oddPrime k` is at least `3` as a real number. -/
 private theorem three_le_cast_oddPrime (k : ℕ) : (3 : ℝ) ≤ oddPrime k := by
   exact_mod_cast oddPrime_zero ▸ oddPrime_strictMono.monotone (Nat.zero_le k)
 
@@ -236,6 +238,7 @@ private theorem norm_tsum_pow_add_div_le {w : ℂ} (hw : ‖w‖ ≤ 3 / 4) {n :
       rw [div_le_iff₀ (by linarith)]
       nlinarith [pow_nonneg hr0 n]
 
+/-- `‖pₖ₊₂ ^ (-s)‖ ^ a = pₖ₊₂ ^ (-(a · re s))` for real `a`. -/
 private theorem norm_oddPrime_cpow_rpow (k : ℕ) (s : ℂ) (a : ℝ) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ ^ a = (oddPrime k : ℝ) ^ (-(a * s.re)) := by
   rw [Complex.norm_natCast_cpow_of_pos (oddPrime_pos k), ← Real.rpow_mul
@@ -244,12 +247,14 @@ private theorem norm_oddPrime_cpow_rpow (k : ℕ) (s : ℂ) (a : ℝ) :
   rw [Complex.neg_re]
   ring
 
+/-- `‖pₖ₊₂ ^ (-s)‖ ^ 2 = pₖ₊₂ ^ (-2 · re s)`. -/
 private theorem norm_oddPrime_cpow_sq (k : ℕ) (s : ℂ) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ ^ 2 = (oddPrime k : ℝ) ^ (-2 * s.re) := by
   rw [← Real.rpow_natCast, norm_oddPrime_cpow_rpow]
   push_cast
   ring_nf
 
+/-- For `1 / 2 < re s`, `‖pₖ₊₂ ^ (-s)‖ ≤ 3 / 4`. -/
 private theorem norm_oddPrime_cpow_le {k : ℕ} {s : ℂ} (hs : 1 / 2 < s.re) :
     ‖(oddPrime k : ℂ) ^ (-s)‖ ≤ 3 / 4 := by
   have h1 : (oddPrime k : ℝ) ^ (-2 * s.re) ≤ (oddPrime k : ℝ) ^ (-1 : ℝ) :=
@@ -272,6 +277,7 @@ theorem norm_tsum_primePowerPart_le (k : ℕ) {s : ℂ} (hs : 1 / 2 < s.re) :
   simp_rw [mul_pow, hw, norm_oddPrime_cpow_sq] at h
   simpa using h
 
+/-- The series defining `primePowerPart s` converges absolutely for `1 / 2 < re s`. -/
 private theorem summable_norm_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
     Summable fun k : ℕ ↦
       ‖∑' m : ℕ, chi4 (oddPrime k) ^ (m + 2) * ((oddPrime k : ℂ) ^ (-s)) ^ (m + 2) / (m + 2)‖ :=
