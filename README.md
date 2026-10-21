@@ -14,8 +14,13 @@ observed that this normalized sequence converges.
 ## Main result
 
 ```lean
-theorem Real.irrational_rokickiConstant : Irrational Real.rokickiConstant
+noncomputable def rho : ℝ :=
+  ∑' k : ℕ, (if Nat.nth Nat.Prime (k + 1) % 4 = 3 then (1 : ℝ) else 0) / 2 ^ (k + 1)
+
+theorem rho_irrational : Irrational rho
 ```
+
+stated in `Comparator/Challenge.lean` and proved in `Comparator/Solution.lean`.
 
 The proof does not use the prime number theorem. If `ρ` were rational its binary digits would be
 eventually periodic, so the partial sums `Σ_{k<n} χ₄(p_{k+2})` of the nontrivial Dirichlet
@@ -34,7 +39,6 @@ function `L(·, χ₄)` stays bounded.
 | `RokickiConstant/PartialSums.lean` | partial sums of eventually periodic sequences; summation by parts; Abel series |
 | `RokickiConstant/LSeriesChi4.lean` | Euler product of `L(s, χ₄)` as `exp (primePart + primePowerPart)`; analytic properties of the prime-power part |
 | `RokickiConstant/CharacterSums.lean` | the partial sums of `χ₄` over the odd primes are neither bounded nor linear |
-| `RokickiConstant/Irrational.lean` | the main theorem |
 | `Comparator/Challenge.lean` | the comparator as a challenge: `rho` defined directly from the specification and `theorem rho_irrational : Irrational rho := by sorry` |
 | `Comparator/Solution.lean` | the same file with the proof filled in, by identifying `rho` with `Real.rokickiConstant` |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
@@ -49,8 +53,7 @@ only in imports, docstring prose and the proof body, so `diff` on them is the au
 ## Status
 
 Complete: `lake build` (the development and the comparator solution) succeeds with no `sorry` and
-no warnings, and `#print axioms` reports only `propext`, `Classical.choice` and `Quot.sound` for
-both `Real.irrational_rokickiConstant` and `rho_irrational`. `lake build ComparatorChallenge`
+no warnings, and `#print axioms rho_irrational` reports only `propext`, `Classical.choice` and `Quot.sound`. `lake build ComparatorChallenge`
 elaborates the challenge alone and reports its one intentional `sorry`.
 
 ## Building
