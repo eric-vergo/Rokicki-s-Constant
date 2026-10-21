@@ -7,4 +7,6 @@ import RokickiConstant.General.CharacterSums
 import RokickiConstant.General.EulerProduct
 import RokickiConstant.General.Expansion
 import RokickiConstant.General.Irrational
+import RokickiConstant.General.Normal
+import RokickiConstant.General.ResidueConstant
 import RokickiConstant.PartialSums
