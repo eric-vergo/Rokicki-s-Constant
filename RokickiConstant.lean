@@ -3,4 +3,8 @@ import RokickiConstant.CharacterSums
 import RokickiConstant.Chi4
 import RokickiConstant.Defs
 import RokickiConstant.EulerProduct
+import RokickiConstant.General.CharacterSums
+import RokickiConstant.General.EulerProduct
+import RokickiConstant.General.Expansion
+import RokickiConstant.General.Irrational
 import RokickiConstant.PartialSums
