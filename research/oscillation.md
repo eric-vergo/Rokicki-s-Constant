@@ -324,3 +324,6 @@ which is an asymptotic statement about a sparse set of `n`.
 * **Other residue constants.** The digit corollary is stated for `χ₄` only; the analogous
   statements for the constants of `General/Expansion.lean` and `General/ResidueConstant.lean`
   should follow from the general theorem in the same way (not stated here).
+
+
+> **Update.** Landau's theorem is now formalized (`RokickiConstant/General/Landau.lean`), and with it the one-sided `Ω₋` result of §6.4: see `research/landau.md`.
