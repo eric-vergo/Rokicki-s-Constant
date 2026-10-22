@@ -125,3 +125,26 @@ prime-square and prime-cube terms; to rotation codings by Diophantine approximat
 squarefree residues by sieve constructions. Where it does not: digits that are infinite
 combinations of Hecke modes (the Gaussian sector digit), and unions of residue classes with
 `ν(A) = |A|`.
+
+## Round 4 (Claude's choice): sign, parity, rates, elliptic curves
+
+The engine behind every result on this branch is the singularity that the prime squares create
+at `s = 1/2`, together with integrality of the contribution of zeros at `1/2`. Four things it
+has not yet been asked to do:
+
+1. **Sign** (`General/Landau.lean`, `research/landau.md`). Landau's theorem: a Dirichlet series
+   or Mellin transform with nonnegative coefficients has a singularity at its abscissa of
+   convergence. With it, positivity plus the prime-square term gives the one-sided
+   `Σ_{p<x} χ(p) = Ω₋(√x/(log x)^A)` for quadratic `χ`: the Chebyshev bias *direction*, with no
+   zeros and no prime number theorem.
+2. **Parity** (`General/Unions.lean`, `research/unions.md`). For a union `A` of unit classes
+   modulo `q`, the single-class mechanism gives `x = (|A| − ν(A))/2` with `ν(A)` even. So
+   `[p_k mod q ∈ A]` is non-periodic unconditionally when `|A|` is odd, and when `|A|` is even
+   and `ν(A) ≠ |A|` the statement is equivalent to a constraint on central zeros: it holds if
+   `L(1/2, χ) ≠ 0` for all `χ` mod `q` (Chowla's conjecture).
+3. **Rates for a single class** (`General/SingleClassRate.lean`): `π(x; q, a) − π(x)/φ(q)` is
+   not `O(√x/(log x)^A)`, `A > 1`, by crossing the flagship with the log-power Abel series.
+4. **Elliptic curves** (`research/elliptic.md`, `scripts/elliptic.py`): the digit
+   `[a_p(E) < 0]` for CM and non-CM curves, the biases of its partial sums (`√x/(2π)`-type for
+   `y² = x³ + x`; Chebyshev-type expected otherwise), irrationality status, and a precise
+   conjecture.
