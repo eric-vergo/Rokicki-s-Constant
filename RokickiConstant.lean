@@ -3,6 +3,7 @@ import RokickiConstant.CharacterSums
 import RokickiConstant.Chi4
 import RokickiConstant.Defs
 import RokickiConstant.EulerProduct
+import RokickiConstant.General.Beatty
 import RokickiConstant.General.CharacterSums
 import RokickiConstant.General.Diophantine
 import RokickiConstant.General.EulerProduct
@@ -13,4 +14,5 @@ import RokickiConstant.General.Lacunary
 import RokickiConstant.General.Normal
 import RokickiConstant.General.Oscillation
 import RokickiConstant.General.ResidueConstant
+import RokickiConstant.General.SingleClass
 import RokickiConstant.PartialSums
