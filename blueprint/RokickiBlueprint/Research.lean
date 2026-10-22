@@ -82,6 +82,31 @@ $`n` binary digits of $`\rho` is not $`O(n^\theta)`.
 The imbalance is $`-S(n)` for $`\chi_4` up to the index shift.
 :::
 
+:::theorem "oscillation_log" (lean := "DirichletCharacter.IsQuadratic.not_isBigO_primesBelow_rpow_div_log_rpow, DirichletCharacter.IsQuadratic.not_isBigO_rpow_div_log_rpow")
+For every nonprincipal quadratic $`\chi`: $`\sum_{p<x} \chi(p) \neq O(\sqrt{x}/(\log x)^A)` for every
+$`A > 1`, and $`S(n) \neq O(\sqrt{n}/(\log n)^A)` for every $`A > 1/2`. This is within a factor
+$`(\log x)^{\varepsilon}` of Littlewood's $`\Omega_\pm(\sqrt{x} \log\log\log x / \log x)`, with no
+explicit formula and no prime number theorem.
+:::
+
+:::proof "oscillation_log" (uses := "oscillation, chebyshev_doubling")
+On the closed half-plane $`\operatorname{Re} s \geq 1/2` the Abel series is dominated by
+$`\sum_k (p_{k+1} - p_k)/(p_k (\log p_k)^A)`, which converges for $`A > 1` (Bertrand's postulate
+and the antitone function $`(\log t)^{1-A}`), so the series is continuous up to the line and
+the contradiction at $`1/2` goes through. Chebyshev's bounds convert between the two scales.
+:::
+
+:::theorem "cubic_rate" (lean := "DirichletCharacter.not_isBigO_rpow_one_third_sub_of_pow_three, DirichletCharacter.not_isBigO_primesBelow_rpow_of_pow_three")
+For every nonprincipal $`\chi` with $`\chi^3 = 1` and every $`\varepsilon > 0`,
+$`S(n) \neq O(n^{1/3 - \varepsilon})`.
+:::
+
+:::proof "cubic_rate" (uses := "order_three, oscillation")
+The order-3 argument with the polynomial-growth Abel series: a bound $`|S(n)| \leq C n^\theta`
+with $`\theta < 1/3` continues $`G_\chi` and $`G_{\bar\chi}` to $`\operatorname{Re} s > \theta`, and the
+blow-up of $`\tfrac13 \sum_{p \nmid q} p^{-3s}` at $`1/3` gives the contradiction.
+:::
+
 # The Diophantine side
 
 :::theorem "chebyshev_doubling" (lean := "Nat.primeCounting_two_mul_le")

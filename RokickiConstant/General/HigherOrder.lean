@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
 import RokickiConstant.General.Irrational
+import RokickiConstant.General.Oscillation
 
 /-!
 # Characters of higher order at the primes
@@ -23,10 +24,13 @@ quadraticity.
   tending to `+∞` as `s → 1 / m⁺`. If every `G_{χ ^ j}`, `0 < j < m`, continues to `re s > 0`,
   the identity theorem continues `L(s, χ) = exp (…)` to `re s > 1 / m` and the blow-up at `1 / m`
   contradicts the continuity of the entire function `L(·, χ)`. The same works for a finite
-  product of `L`-functions (`not_forall_exists_differentiableOn_primePart`).
-* **Order 3.** If `χ ^ 3 = 1` then `χ² = χ̄` on the primes, so bounded `re S` continues both
-  `j = 1` and `j = 2` terms of `log (L(s, χ) L(s, χ̄))`, and the `j = 3` term blows up at `1 / 3`:
-  the partial sums `∑_{k < n} re χ(pₖ)`, a fortiori `S n`, are unbounded.
+  product of `L`-functions, and continuation to `re s > θ` with `0 ≤ θ < 1 / m` suffices
+  (`not_forall_exists_differentiableOn_primePart_of_lt`).
+* **Order 3.** If `χ ^ 3 = 1` then `χ² = χ̄` on the primes, so `re S = O(n ^ θ)` continues both
+  `j = 1` and `j = 2` terms of `log (L(s, χ) L(s, χ̄))` to `re s > θ` (the polynomial-growth Abel
+  series of `RokickiConstant.General.Oscillation`), and the `j = 3` term blows up at `1 / 3`:
+  for `θ < 1 / 3` the partial sums `∑_{k < n} re χ(pₖ)`, a fortiori `S n`, are not `O(n ^ θ)`.
+  The bounded case is `θ = 0`.
 * **Cubic residue constants.** Consequently `k ↦ χ(pₖ)` is not eventually periodic for a
   nonprincipal cubic `χ`, and the number whose `k`-th digit records whether `pₖ` is a cube modulo
   a prime `ℓ ≡ 1 (mod 3)` is irrational.
@@ -45,9 +49,16 @@ For `m ≥ 4` the bounded partial sums of `χ` alone do not continue the terms `
 * `DirichletCharacter.exists_norm_primePart_le`
 * `DirichletCharacter.not_exists_norm_sum_sub_mul_le`: the linear case, complex slope.
 * `DirichletCharacter.not_exists_abs_sum_re_sub_mul_le`: the linear case for the real parts.
-* `DirichletCharacter.not_forall_exists_differentiableOn_primePart`: the order-`m` argument.
+* `DirichletCharacter.not_forall_exists_differentiableOn_primePart_of_lt`: the order-`m`
+  argument; `DirichletCharacter.not_forall_exists_differentiableOn_primePart` is `θ = 0`.
 * `DirichletCharacter.not_forall_exists_norm_sum_pow_le`: the simultaneous order-`m` statement;
   `DirichletCharacter.not_forall_exists_norm_sum_pow_le_of_two_mul_le` needs only `j ≤ m / 2`.
+* `DirichletCharacter.not_exists_norm_sum_le_rpow_of_pow_three`: order 3, `S n ≠ O(n ^ θ)` for
+  `θ < 1 / 3`; `not_exists_abs_sum_re_le_rpow_of_pow_three` for the real parts;
+  `not_isBigO_rpow_of_pow_three`, `not_isBigO_rpow_one_third_sub_of_pow_three`,
+  `not_isBigO_sum_re_rpow_of_pow_three`: Landau form;
+  `not_exists_norm_sum_primesBelow_le_rpow_of_pow_three`,
+  `not_isBigO_primesBelow_rpow_of_pow_three`: the sums `∑_{p < x} χ(p)` against `x ^ θ`.
 * `DirichletCharacter.not_exists_norm_sum_le_of_pow_three`: order 3, bounded sums.
 * `DirichletCharacter.not_exists_abs_sum_re_le_of_pow_three`: order 3, bounded real parts.
 * `DirichletCharacter.irrational_tsum_of_pow_three`
@@ -484,28 +495,30 @@ section Engine
 
 variable {q : ℕ} [NeZero q]
 
-/-- **The order-`m` argument.** Let `X` be a nonempty finite set of nonprincipal Dirichlet
-characters with `ψ ^ m = 1` for all `ψ ∈ X`. Then it is impossible that for every `0 < j < m` the
-sum `∑_{ψ ∈ X} ∑ₖ ψ(pₖ) ^ j pₖ ^ (-s)` of prime parts continues holomorphically from `re s > 1`
-to `re s > 0`.
+/-- **The order-`m` argument, with a continuation to `re s > θ`.** Let `X` be a nonempty finite
+set of nonprincipal Dirichlet characters with `ψ ^ m = 1` for all `ψ ∈ X`, and let
+`0 ≤ θ < 1 / m`. Then it is impossible that for every `0 < j < m` the sum
+`∑_{ψ ∈ X} ∑ₖ ψ(pₖ) ^ j pₖ ^ (-s)` of prime parts continues holomorphically from `re s > 1` to
+`re s > θ`.
 
 Otherwise `∏_{ψ ∈ X} L(s, ψ) = exp Φ(s)` with
 `Φ(s) = ∑_{0 < j < m} B_j(j s) / j + ∑_{ψ ∈ X} tailPart ψ m s` holomorphic on `re s > 1 / m`
-(identity theorem), and as `σ → 1 / m⁺` the terms `B_j(j σ)` stay bounded while
+(identity theorem), and as `σ → 1 / m⁺` the terms `B_j(j σ)` stay bounded (as `θ < 1 / m`) while
 `re (tailPart ψ m σ) → +∞`, contradicting the continuity of the entire function `∏ L(·, ψ)` at
 `1 / m`. -/
-theorem not_forall_exists_differentiableOn_primePart {X : Finset (DirichletCharacter ℂ q)}
-    (hX : X.Nonempty) (hX₁ : ∀ ψ ∈ X, ψ ≠ 1) {m : ℕ} (hm : 0 < m) (hXm : ∀ ψ ∈ X, ψ ^ m = 1) :
-    ¬ ∀ j, 0 < j → j < m → ∃ B : ℂ → ℂ, DifferentiableOn ℂ B {s : ℂ | 0 < s.re} ∧
+theorem not_forall_exists_differentiableOn_primePart_of_lt {X : Finset (DirichletCharacter ℂ q)}
+    (hX : X.Nonempty) (hX₁ : ∀ ψ ∈ X, ψ ≠ 1) {m : ℕ} (hm : 0 < m) (hXm : ∀ ψ ∈ X, ψ ^ m = 1)
+    {θ : ℝ} (hθ₀ : 0 ≤ θ) (hθm : θ < 1 / m) :
+    ¬ ∀ j, 0 < j → j < m → ∃ B : ℂ → ℂ, DifferentiableOn ℂ B {s : ℂ | θ < s.re} ∧
       ∀ s : ℂ, 1 < s.re → B s = ∑ ψ ∈ X, (ψ ^ j).primePart s := by
   intro h
   choose! B hB hBeq using h
   have hm' : (0 : ℝ) < m := Nat.cast_pos.2 hm
-  set V : Set ℂ := {s | 0 < s.re}
+  set V : Set ℂ := {s | θ < s.re}
   set U : Set ℂ := {s | 1 / m < s.re}
   have hVo : IsOpen V := isOpen_lt continuous_const continuous_re
   have hUo : IsOpen U := isOpen_lt continuous_const continuous_re
-  have hUV : U ⊆ V := fun s (hs : 1 / m < s.re) ↦ show 0 < s.re from lt_trans (by positivity) hs
+  have hUV : U ⊆ V := fun s (hs : 1 / m < s.re) ↦ show θ < s.re from hθm.trans hs
   set A : ℂ → ℂ := fun s ↦ ∑ j ∈ range m, B j (j * s) / j
   set Φ : ℂ → ℂ := fun s ↦ A s + ∑ ψ ∈ X, ψ.tailPart m s
   set Lp : ℂ → ℂ := fun s ↦ ∏ ψ ∈ X, LFunction ψ s
@@ -513,10 +526,11 @@ theorem not_forall_exists_differentiableOn_primePart {X : Finset (DirichletChara
     refine DifferentiableOn.fun_sum fun j hj ↦ ?_
     rcases Nat.eq_zero_or_pos j with rfl | hj0
     · simp
-    · have hmaps : Set.MapsTo (fun s : ℂ ↦ (j : ℂ) * s) V V := fun s (hs : 0 < s.re) ↦ by
-        change 0 < ((j : ℂ) * s).re
+    · have hmaps : Set.MapsTo (fun s : ℂ ↦ (j : ℂ) * s) V V := fun s (hs : θ < s.re) ↦ by
+        change θ < ((j : ℂ) * s).re
         simp only [mul_re, natCast_re, natCast_im, zero_mul, sub_zero]
-        exact mul_pos (Nat.cast_pos.2 hj0) hs
+        have hj' : (1 : ℝ) ≤ j := Nat.one_le_cast.2 hj0
+        nlinarith
       exact ((hB j hj0 (mem_range.1 hj)).comp (differentiableOn_id.const_mul (j : ℂ))
         hmaps).div_const _
   have hΦ : DifferentiableOn ℂ Φ U :=
@@ -567,10 +581,10 @@ theorem not_forall_exists_differentiableOn_primePart {X : Finset (DirichletChara
         have := hEq (show (σ : ℂ) ∈ U by simpa [U] using hσ)
         simp only at this
         simp [← this, Complex.norm_exp])
-  -- ... but `re A σ` converges and `re (tailPart ψ m σ) → +∞`
+  -- ... but `re A σ` converges (as `θ < 1 / m`) and `re (tailPart ψ m σ) → +∞`
   have hAc : ContinuousAt (fun σ : ℝ ↦ (A σ).re) (1 / m) :=
     continuous_re.continuousAt.comp ((hA.continuousOn.continuousAt (hVo.mem_nhds
-      (show (0 : ℝ) < ((1 / m : ℝ) : ℂ).re by rw [ofReal_re]; positivity))).comp
+      (show θ < ((1 / m : ℝ) : ℂ).re by rw [ofReal_re]; exact hθm))).comp
       continuous_ofReal.continuousAt)
   have htail : Tendsto (fun σ : ℝ ↦ (∑ ψ ∈ X, ψ.tailPart m σ).re) (𝓝[>] (1 / m)) atTop := by
     simp only [re_sum]
@@ -580,6 +594,17 @@ theorem not_forall_exists_differentiableOn_primePart {X : Finset (DirichletChara
     simp only [Φ, add_re]
     exact (hAc.tendsto.mono_left nhdsWithin_le_nhds).add_atTop htail
   exact not_tendsto_atTop_of_tendsto_nhds hlim hinf
+
+/-- **The order-`m` argument.** Let `X` be a nonempty finite set of nonprincipal Dirichlet
+characters with `ψ ^ m = 1` for all `ψ ∈ X`. Then it is impossible that for every `0 < j < m` the
+sum `∑_{ψ ∈ X} ∑ₖ ψ(pₖ) ^ j pₖ ^ (-s)` of prime parts continues holomorphically from `re s > 1`
+to `re s > 0`. This is `not_forall_exists_differentiableOn_primePart_of_lt` with `θ = 0`. -/
+theorem not_forall_exists_differentiableOn_primePart {X : Finset (DirichletCharacter ℂ q)}
+    (hX : X.Nonempty) (hX₁ : ∀ ψ ∈ X, ψ ≠ 1) {m : ℕ} (hm : 0 < m) (hXm : ∀ ψ ∈ X, ψ ^ m = 1) :
+    ¬ ∀ j, 0 < j → j < m → ∃ B : ℂ → ℂ, DifferentiableOn ℂ B {s : ℂ | 0 < s.re} ∧
+      ∀ s : ℂ, 1 < s.re → B s = ∑ ψ ∈ X, (ψ ^ j).primePart s :=
+  not_forall_exists_differentiableOn_primePart_of_lt hX hX₁ hm hXm le_rfl
+    (by have : (0 : ℝ) < m := Nat.cast_pos.2 hm; positivity)
 
 /-- **Simultaneous version for characters of order `m`.** If `χ ≠ 1` and `χ ^ m = 1`, the partial
 sums `∑_{k < n} χ(pₖ) ^ j` cannot all be bounded for `0 < j < m`. For `m = 2` this is
@@ -672,48 +697,90 @@ theorem apply_sq_eq_conj_of_pow_three (h3 : χ ^ 3 = 1) (a : ZMod q) :
   · exact sq_eq_conj_of_pow_three_eq_one (χ.apply_pow_eq_one_of_isUnit h3 ha)
   · simp [χ.map_nonunit ha]
 
+/-- For a character with `χ ^ 3 = 1`, `χ(a) + χ²(a) = 2 re χ(a)`. -/
+theorem apply_add_sq_apply_eq_of_pow_three (h3 : χ ^ 3 = 1) (a : ZMod q) :
+    χ a + (χ ^ 2) a = ((2 * (χ a).re : ℝ) : ℂ) := by
+  rw [MulChar.pow_apply' χ two_ne_zero, apply_sq_eq_conj_of_pow_three h3, add_conj]
+
 variable [NeZero q]
 
-/-- **Characters of order 3: the real parts of the partial sums are unbounded.** For a
-nonprincipal `χ` with `χ ^ 3 = 1`, the sums `∑_{k < n} re χ(pₖ)` are unbounded.
+/-- **Characters of order 3, prime-scale form.** For a nonprincipal `χ` with `χ ^ 3 = 1` and
+`θ < 1 / 3`, there is no constant `C` with `|∑_{j ≤ k} re χ(pⱼ)| ≤ C pₖ ^ θ` for all `k`.
 
-Apply `not_forall_exists_differentiableOn_primePart` with `X = {χ, χ²}` and `m = 3`: since
-`χ² = χ̄` on the primes, both `j = 1` and `j = 2` require only the continuation of
-`G_χ + G_{χ̄} = 2 ∑ₖ re χ(pₖ) pₖ ^ (-s)`, which the Abel series provides. -/
-theorem not_exists_abs_sum_re_le_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) :
-    ¬ ∃ C : ℝ, ∀ n, |∑ k ∈ range n, (χ (nthPrime k)).re| ≤ C := by
+Apply `not_forall_exists_differentiableOn_primePart_of_lt` with `X = {χ, χ²}`, `m = 3` and the
+exponent `max θ 0 < 1 / 3`: since `χ² = χ̄` on the primes, both `j = 1` and `j = 2` require only
+the continuation of `G_χ + G_{χ̄} = 2 ∑ₖ re χ(pₖ) pₖ ^ (-s)` to `re s > max θ 0`, which the Abel
+series under polynomially bounded partial sums provides. The bounded case is `θ = 0`. -/
+theorem not_exists_abs_sum_succ_re_le_nthPrime_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1)
+    {θ : ℝ} (hθ : θ < 1 / 3) :
+    ¬ ∃ C : ℝ, ∀ k, |∑ j ∈ range (k + 1), (χ (nthPrime j)).re| ≤ C * (nthPrime k : ℝ) ^ θ := by
   classical
   rintro ⟨C, hC⟩
+  have hθ' : max θ 0 < 1 / ((3 : ℕ) : ℝ) := max_lt (by simpa using hθ) (by norm_num)
   have hne : χ ≠ χ ^ 2 := fun h ↦ hχ (by rw [pow_two] at h; exact mul_eq_left.1 h.symm)
   have h21 : χ ^ 2 ≠ 1 := fun h ↦ hχ (by rwa [pow_succ, h, one_mul] at h3)
   have h23 : (χ ^ 2) ^ 3 = 1 := by rw [← pow_mul, mul_comm, pow_mul, h3, one_pow]
   have h4 : (χ ^ 2) ^ 2 = χ := by
     rw [← pow_mul, show 2 * 2 = 3 + 1 by rfl, pow_succ, h3, one_mul]
   set a : ℕ → ℂ := fun k ↦ χ (nthPrime k) + (χ ^ 2) (nthPrime k)
-  have ha : ∀ n, ‖∑ k ∈ range n, a k‖ ≤ 2 * C := fun n ↦ by
-    have : ∑ k ∈ range n, a k = ((2 * ∑ k ∈ range n, (χ (nthPrime k)).re : ℝ) : ℂ) := by
-      push_cast
+  have ha : ∀ k, ‖∑ j ∈ range (k + 1), a j‖ ≤ 2 * |C| * (nthPrime k : ℝ) ^ max θ 0 := by
+    intro k
+    have : ∑ j ∈ range (k + 1), a j =
+        ((2 * ∑ j ∈ range (k + 1), (χ (nthPrime j)).re : ℝ) : ℂ) := by
       rw [mul_sum]
-      refine sum_congr rfl fun k _ ↦ ?_
-      simp only [a]
-      rw [MulChar.pow_apply' χ two_ne_zero, apply_sq_eq_conj_of_pow_three h3, add_conj]
       push_cast
-      rfl
-    rw [this, norm_real, Real.norm_eq_abs, abs_mul, abs_two]
-    linarith [hC n]
-  refine not_forall_exists_differentiableOn_primePart (X := {χ, χ ^ 2}) (insert_nonempty _ _)
-    (by simp [hχ, h21]) (m := 3) (by norm_num) (by simp [h3, h23]) fun j hj hj3 ↦ ⟨abelSeries a
-      nthPrime, differentiableOn_abelSeries ha (Nat.prime_nth_prime 0).pos nthPrime_strictMono,
-      fun s hs ↦ ?_⟩
+      exact sum_congr rfl fun j _ ↦ by
+        simpa only [ofReal_mul, ofReal_ofNat] using apply_add_sq_apply_eq_of_pow_three h3 _
+    rw [this, norm_real, Real.norm_eq_abs, abs_mul, abs_two, mul_assoc]
+    exact mul_le_mul_of_nonneg_left ((hC k).trans (mul_rpow_le_abs_mul_rpow_max
+      (Nat.one_le_cast.2 (Nat.prime_nth_prime k).one_le) le_rfl)) zero_le_two
+  have hb : ∀ k, ‖a k‖ ≤ 2 := fun k ↦ (norm_add_le _ _).trans (by
+    linarith [χ.norm_le_one (nthPrime k), (χ ^ 2).norm_le_one (nthPrime k)])
+  refine not_forall_exists_differentiableOn_primePart_of_lt (X := {χ, χ ^ 2})
+    (insert_nonempty _ _) (by simp [hχ, h21]) (m := 3) (by norm_num) (by simp [h3, h23])
+    (le_max_right θ 0) hθ' fun j hj hj3 ↦ ⟨abelSeries a nthPrime,
+      differentiableOn_abelSeries_of_le_rpow (le_max_right θ 0) ha (Nat.prime_nth_prime 0).pos
+        nthPrime_strictMono, fun s hs ↦ ?_⟩
   have e : ∑' k, a k * (nthPrime k : ℂ) ^ (-s) = χ.primePart s + (χ ^ 2).primePart s := by
     rw [primePart, primePart, ← Summable.tsum_add (χ.summable_primeTerm hs)
       ((χ ^ 2).summable_primeTerm hs)]
     exact tsum_congr fun k ↦ by simp only [a, primeTerm]; ring
-  rw [abelSeries_eq_tsum ha (Nat.prime_nth_prime 0).pos nthPrime_strictMono hs, e,
-    sum_pair hne]
+  have hθs : max θ 0 < s.re := hθ'.trans (by norm_num; linarith)
+  rw [abelSeries_eq_tsum_of_le_rpow (le_max_right θ 0) ha hb (Nat.prime_nth_prime 0).pos
+    nthPrime_strictMono hs hθs, e, sum_pair hne]
   interval_cases j
   · simp only [pow_one]
   · rw [h4, add_comm]
+
+/-- **Characters of order 3: the real parts are not `O(n ^ θ)` for `θ < 1 / 3`.** For a
+nonprincipal `χ` with `χ ^ 3 = 1` and `θ < 1 / 3`, there is no constant `C` with
+`|∑_{k < n} re χ(pₖ)| ≤ C n ^ θ` for all `n`. -/
+theorem not_exists_abs_sum_re_le_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {θ : ℝ}
+    (hθ : θ < 1 / 3) :
+    ¬ ∃ C : ℝ, ∀ n, |∑ k ∈ range n, (χ (nthPrime k)).re| ≤ C * (n : ℝ) ^ θ := by
+  rintro ⟨C, hC⟩
+  refine not_exists_abs_sum_succ_re_le_nthPrime_rpow_of_pow_three hχ h3
+    (max_lt hθ (by norm_num : (0 : ℝ) < 1 / 3))
+    ⟨|C|, fun k ↦ (hC (k + 1)).trans (mul_rpow_le_abs_mul_rpow_max (by simp) ?_)⟩
+  exact_mod_cast (Nat.add_two_le_nth_prime k).trans' (by omega)
+
+/-- **Characters of order 3: quantitative oscillation.** For a nonprincipal `χ` with `χ ^ 3 = 1`
+and `θ < 1 / 3`, the partial sums `∑_{k < n} χ(pₖ)` are not bounded by `C n ^ θ`. -/
+theorem not_exists_norm_sum_le_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {θ : ℝ}
+    (hθ : θ < 1 / 3) :
+    ¬ ∃ C : ℝ, ∀ n, ‖∑ k ∈ range n, χ (nthPrime k)‖ ≤ C * (n : ℝ) ^ θ := by
+  rintro ⟨C, hC⟩
+  exact not_exists_abs_sum_re_le_rpow_of_pow_three hχ h3 hθ
+    ⟨C, fun n ↦ by simpa [re_sum] using (abs_re_le_norm _).trans (hC n)⟩
+
+/-- **Characters of order 3: the real parts of the partial sums are unbounded.** For a
+nonprincipal `χ` with `χ ^ 3 = 1`, the sums `∑_{k < n} re χ(pₖ)` are unbounded. This is the case
+`θ = 0` of `not_exists_abs_sum_re_le_rpow_of_pow_three`. -/
+theorem not_exists_abs_sum_re_le_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) :
+    ¬ ∃ C : ℝ, ∀ n, |∑ k ∈ range n, (χ (nthPrime k)).re| ≤ C := by
+  rintro ⟨C, hC⟩
+  exact not_exists_abs_sum_re_le_rpow_of_pow_three hχ h3 (θ := 0) (by norm_num)
+    ⟨C, fun n ↦ by simpa using hC n⟩
 
 /-- **Characters of order 3: bounded partial sums are impossible.** For a nonprincipal `χ` with
 `χ ^ 3 = 1`, the partial sums `∑_{k < n} χ(pₖ)` are unbounded. -/
@@ -723,6 +790,59 @@ theorem not_exists_norm_sum_le_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) :
   exact not_exists_abs_sum_re_le_of_pow_three hχ h3
     ⟨C, fun n ↦ by simpa [re_sum] using (abs_re_le_norm _).trans (hC n)⟩
 
+/-- **Characters of order 3, Landau form.** For a nonprincipal `χ` with `χ ^ 3 = 1` and
+`θ < 1 / 3`, `∑_{k < n} χ(pₖ)` is not `O(n ^ θ)`. -/
+theorem not_isBigO_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {θ : ℝ} (hθ : θ < 1 / 3) :
+    ¬ (fun n : ℕ ↦ ∑ k ∈ range n, χ (nthPrime k)) =O[atTop] fun n : ℕ ↦ (n : ℝ) ^ θ :=
+  fun h ↦ not_exists_norm_sum_le_rpow_of_pow_three hχ h3 (max_lt hθ (by norm_num))
+    (exists_forall_norm_le_rpow_of_isBigO (by simp) h)
+
+/-- For a nonprincipal `χ` with `χ ^ 3 = 1` and every `ε > 0`, `∑_{k < n} χ(pₖ)` is not
+`O(n ^ (1 / 3 - ε))`. -/
+theorem not_isBigO_rpow_one_third_sub_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {ε : ℝ}
+    (hε : 0 < ε) :
+    ¬ (fun n : ℕ ↦ ∑ k ∈ range n, χ (nthPrime k)) =O[atTop]
+      fun n : ℕ ↦ (n : ℝ) ^ (1 / 3 - ε) :=
+  not_isBigO_rpow_of_pow_three hχ h3 (by linarith)
+
+/-- For a nonprincipal `χ` with `χ ^ 3 = 1` and `θ < 1 / 3`, the real parts
+`∑_{k < n} re χ(pₖ)` are not `O(n ^ θ)`. -/
+theorem not_isBigO_sum_re_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {θ : ℝ}
+    (hθ : θ < 1 / 3) :
+    ¬ (fun n : ℕ ↦ ∑ k ∈ range n, (χ (nthPrime k)).re) =O[atTop] fun n : ℕ ↦ (n : ℝ) ^ θ :=
+  fun h ↦ not_exists_abs_sum_re_le_rpow_of_pow_three hχ h3 (max_lt hθ (by norm_num))
+    (exists_forall_norm_le_rpow_of_isBigO (by simp) h)
+
+/-- **Characters of order 3, over the primes below `x`.** For a nonprincipal `χ` with
+`χ ^ 3 = 1` and `θ < 1 / 3`, `∑_{p < x} χ(p)` is not bounded by `C x ^ θ`. -/
+theorem not_exists_norm_sum_primesBelow_le_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1)
+    {θ : ℝ} (hθ : θ < 1 / 3) :
+    ¬ ∃ C : ℝ, ∀ x : ℕ, ‖∑ p ∈ Nat.primesBelow x, χ p‖ ≤ C * (x : ℝ) ^ θ := by
+  rintro ⟨C, hC⟩
+  refine not_exists_abs_sum_succ_re_le_nthPrime_rpow_of_pow_three hχ h3
+    (max_lt hθ (by norm_num : (0 : ℝ) < 1 / 3)) ⟨|C| * 2 ^ max θ 0, fun k ↦ ?_⟩
+  have hp : (1 : ℝ) ≤ nthPrime k := Nat.one_le_cast.2 (Nat.prime_nth_prime k).one_le
+  have hcount : Nat.primeCounting' (nthPrime k + 1) = k + 1 :=
+    Nat.count_nth_succ_of_infinite Nat.infinite_setOfPred_prime k
+  have h := hC (nthPrime k + 1)
+  rw [χ.sum_primesBelow_eq, hcount] at h
+  have hre : |∑ j ∈ range (k + 1), (χ (nthPrime j)).re| ≤
+      ‖∑ j ∈ range (k + 1), χ (nthPrime j)‖ := by
+    simpa [re_sum] using abs_re_le_norm (∑ j ∈ range (k + 1), χ (nthPrime j))
+  refine hre.trans (h.trans ((mul_rpow_le_abs_mul_rpow_max (by push_cast; linarith)
+    le_rfl).trans ?_))
+  rw [mul_assoc, ← Real.mul_rpow (by norm_num) (by positivity)]
+  gcongr
+  push_cast
+  linarith
+
+/-- For a nonprincipal `χ` with `χ ^ 3 = 1` and `θ < 1 / 3`, `∑_{p < x} χ(p)` is not
+`O(x ^ θ)`. -/
+theorem not_isBigO_primesBelow_rpow_of_pow_three (hχ : χ ≠ 1) (h3 : χ ^ 3 = 1) {θ : ℝ}
+    (hθ : θ < 1 / 3) :
+    ¬ (fun x : ℕ ↦ ∑ p ∈ Nat.primesBelow x, χ p) =O[atTop] fun x : ℕ ↦ (x : ℝ) ^ θ :=
+  fun h ↦ not_exists_norm_sum_primesBelow_le_rpow_of_pow_three hχ h3 (max_lt hθ (by norm_num))
+    (exists_forall_norm_le_rpow_of_isBigO (by simp [Nat.primesBelow_zero]) h)
 
 /-- **Characters of order 3: the values at the primes are not eventually periodic**, not even
 their real parts. -/

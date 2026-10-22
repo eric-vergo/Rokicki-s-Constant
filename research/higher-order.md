@@ -5,6 +5,7 @@
 1. the linear case `S(n) = c·n + O(1)`, `c ≠ 0` complex, is impossible for **every** nonprincipal
    Dirichlet character;
 2. for a character of **order 3**, the partial sums are unbounded, and even their real parts are;
+   quantitatively, they are not `O(n^θ)` for any `θ < 1/3` (section 7);
 3. for every order `m`, a *simultaneous* statement: the sums `S_{χ^j}` for `1 ≤ j ≤ m/2` are not
    all bounded;
 4. the **cubic residue constants** (digit `k` records whether `p_k` is a cube modulo a prime
@@ -32,11 +33,12 @@ All in namespace `DirichletCharacter` unless marked; `[NeZero q]` throughout.
 | `Σ_{k<n} re χ(p_k) ≠ c·n + O(1)`, real `c ≠ 0` | `not_exists_abs_sum_re_sub_mul_le` |
 | Split of (1) at `j = m`: `G_χ + (prime powers) = Σ_{j<m} G_{χ^j}(j s)/j + tailPart χ m s` | `primePart_add_primePowerPart_eq` |
 | `tailPart χ m` holomorphic on `re s > 1/m`; `re → +∞` at `1/m⁺` if `χ^m = 1` | `differentiableOn_tailPart`, `tendsto_re_tailPart` |
-| Engine: for a nonempty set `X` of nonprincipal `ψ` with `ψ^m = 1`, the sums `Σ_{ψ∈X} G_{ψ^j}`, `0 < j < m`, cannot all continue holomorphically to `re s > 0` | `not_forall_exists_differentiableOn_primePart` |
+| Engine: for a nonempty set `X` of nonprincipal `ψ` with `ψ^m = 1` and `0 ≤ θ < 1/m`, the sums `Σ_{ψ∈X} G_{ψ^j}`, `0 < j < m`, cannot all continue holomorphically to `re s > θ` | `not_forall_exists_differentiableOn_primePart_of_lt` (`θ = 0`: `not_forall_exists_differentiableOn_primePart`) |
 | `χ^m = 1`, `χ ≠ 1`: the `S_{χ^j}`, `0 < j < m`, are not all bounded | `not_forall_exists_norm_sum_pow_le` |
 | same with `0 < j ≤ m/2` only (`S_{χ^{m-j}} = conj S_{χ^j}`) | `not_forall_exists_norm_sum_pow_le_of_two_mul_le` |
 | `χ^3 = 1`, `χ ≠ 1`: `Σ_{k<n} re χ(p_k)` unbounded | `not_exists_abs_sum_re_le_of_pow_three` |
 | `χ^3 = 1`, `χ ≠ 1`: `S_χ(n)` unbounded | `not_exists_norm_sum_le_of_pow_three` |
+| `χ^3 = 1`, `χ ≠ 1`, `θ < 1/3`: `S_χ(n) ≠ O(n^θ)`, also for `re S_χ` and for `Σ_{p<x} χ(p)` vs `x^θ` | section 7 |
 | `χ^3 = 1`, `χ ≠ 1`: `k ↦ re χ(p_k)` not eventually periodic | `not_eventuallyPeriodic_re_apply_nthPrime` |
 | digits `f(χ(p_k)) < b` with `f z ≠ f 1` for cube roots `z ≠ 1` give an irrational number | `irrational_tsum_of_pow_three` (and `'` for `f` injective on cube roots) |
 | a cubic character exists modulo every prime `ℓ ≡ 1 (mod 3)` | `exists_ne_one_pow_three_eq_one` |
@@ -205,11 +207,8 @@ of the order-6 character mod 7 are unbounded by the conditional argument (`μ(5)
    `im S_χ` forces only `L(·, χ)/L(·, χ̄)` to be zero-free on `re s > 1/2`, i.e. the zeros of
    `L(·, χ)` there to be symmetric under conjugation. Consequently the irrationality of digit
    sequences that distinguish `ω` from `ω²` but not `1` from `ω` is open by this method.
-3. **Rates.** Combining with Direction 2: if `|S_χ(n)| ≤ C n^θ` with `θ < 1/3` (cubic `χ`), the
-   Abel series continue `G_χ` to `re s > θ` and `G_χ̄(2s)` to `re s > θ/2`, and the blow-up at `1/3`
-   still applies; so `S_χ ≠ O(n^{1/3-ε})` for cubic `χ` without zeros. (Classically
-   `Ω(n^{1/2-ε})` holds through zeros.) The formal version needs the polynomially bounded Abel
-   series of Direction 2.
+3. **Rates.** Done for order 3: `S_χ ≠ O(n^{1/3-ε})` without zeros (section 7). Open: any
+   zero-free improvement of the exponent `1/3` (the method cannot give one, see section 7).
 4. **Prime-power moduli and non-squarefree orders.** Is there any zero-free argument for a single
    character of order 4? Section 4 shows the blow-up method cannot work; the multiplicative
    identity `L(s, χ)² / L(2s, χ²) = exp(H(s))` on `re s > 1/5` is the precise residual
@@ -218,3 +217,61 @@ of the order-6 character mod 7 are unbounded by the conditional argument (`μ(5)
    order `n ∣ ℓ - 1` modulo a prime `ℓ`; the cubic residue constant is the first instance beyond the
    quadratic one. For order 5 or 7 residue symbols, irrationality would follow from the
    conditional theorem of section 4 (squarefree orders) but not from what is formalized.
+
+## 7. Quantitative version
+
+**Theorem (formalized).** Let `χ` be a nonprincipal Dirichlet character with `χ³ = 1` and let
+`θ < 1/3`. Then there is no `C` with `|Σ_{k<n} re χ(p_k)| ≤ C n^θ` for all `n`; a fortiori
+`S_χ(n) = Σ_{k<n} χ(p_k)` is not `O(n^θ)`, i.e. `S_χ(n) ≠ O(n^{1/3-ε})` for every `ε > 0`. The
+same holds on the `x`-scale: `Σ_{p<x} χ(p)` is not `O(x^θ)`.
+
+| Statement | Lean (namespace `DirichletCharacter`) |
+|---|---|
+| no `C` with `\|Σ_{j≤k} re χ(p_j)\| ≤ C p_k^θ` (prime scale, the core) | `not_exists_abs_sum_succ_re_le_nthPrime_rpow_of_pow_three` |
+| no `C` with `\|Σ_{k<n} re χ(p_k)\| ≤ C n^θ` | `not_exists_abs_sum_re_le_rpow_of_pow_three` |
+| no `C` with `‖S_χ(n)‖ ≤ C n^θ` | `not_exists_norm_sum_le_rpow_of_pow_three` |
+| `S_χ ≠ O(n^θ)`; `S_χ ≠ O(n^{1/3-ε})`; `re S_χ ≠ O(n^θ)` | `not_isBigO_rpow_of_pow_three`, `not_isBigO_rpow_one_third_sub_of_pow_three`, `not_isBigO_sum_re_rpow_of_pow_three` |
+| no `C` with `‖Σ_{p<x} χ(p)‖ ≤ C x^θ`; `Σ_{p<x} χ(p) ≠ O(x^θ)` | `not_exists_norm_sum_primesBelow_le_rpow_of_pow_three`, `not_isBigO_primesBelow_rpow_of_pow_three` |
+
+All hypotheses: `χ ≠ 1`, `χ ^ 3 = 1`, `θ < 1 / 3` (any real `θ`; negative `θ` is reduced to
+`θ = 0` through `max θ 0`).
+
+**Proof.** The bounded proof of section 2 with the Abel series of Direction 2
+(`Oscillation.lean`): `|Σ_{j≤k} re χ(p_j)| ≤ C p_k^θ` makes the Abel series of `χ + χ²`
+(`= 2 re χ` on the primes) holomorphic on `re s > θ` and equal to `G_χ + G_{χ²}` on `re s > 1`.
+The engine now takes this exponent as a parameter: continuation of the `j < m` terms to
+`re s > θ` with `0 ≤ θ < 1/m` suffices, since then `B_j(js)` is holomorphic on `re s > 1/m` and
+*continuous at `1/m`* (`1/m > θ`), while the tail blows up there. The bounded theorems are the
+case `θ = 0` of the same lemma (`not_forall_exists_differentiableOn_primePart` and
+`not_exists_abs_sum_re_le_of_pow_three` are now one-line corollaries), so there is one proof.
+
+**Why `1/3`.** The `j = 3` term `Σ_p χ(p)³ p^{-3s}/3 = Σ_{p∤q} p^{-3s}/3` of (1) is the first
+term the hypothesis does not control, and it is the first singularity the method sees: it diverges
+at the real point `s = 1/3`. The hypothesis continues the `j = 1, 2` terms past `1/3` exactly when
+`θ < 1/3`; at `θ = 1/3` the Abel series is no longer known to be continuous at `1/3` and the
+argument breaks.
+
+**Comparison with the quadratic case.** For quadratic `χ`, `χ² = χ_0` on the primes, so already
+the `j = 2` term `Σ_{p∤q} p^{-2s}/2` diverges, at `1/2`: Direction 2 gives `S_χ ≠ O(n^{1/2-ε})`.
+For cubic `χ` the `j = 2` term is `G_χ̄(2s)/2`, which oscillates and is continued by the hypothesis
+itself, and the first principal power is `χ³ = χ_0`; hence `1/3`. In general the method can only
+reach the exponent `1/m` for order `m` (the first `j` with `χ^j = χ_0`), and for `m ≥ 4` it does
+not reach anything (section 4).
+
+**What is expected to be true.** For every nonprincipal `χ`, classically through zeros,
+`Σ_{p≤x} χ(p) = Ω(√x / log x)`: `L(s, χ)` has (infinitely many) nontrivial zeros, all with
+`re ρ ≤ 1` and some with `re ρ ≥ 1/2`; the explicit formula
+`Σ_{n≤x} Λ(n) χ(n) = -Σ_ρ x^ρ/ρ + …` and a Landau-type argument give `Ω(x^{β-ε})` for a zero with
+real part `β ≥ 1/2` (and `Ω(√x)` for `Σ Λχ` on GRH), whence `Ω(√x / log x)` for the prime sum by
+partial summation. Numerically (section 5) `|S_χ(n)|` tracks `√p_n / log p_n`. Our `1/3` is
+weaker because the zero-free method sees only the singularity of `log L` on the real axis
+forced by the principal power `χ³ = χ_0`, never the zeros of `L(·, χ)`, which sit at
+`re s = 1/2` (or further right).
+
+**Digit corollary (not formalized).** For a prime `ℓ ≡ 1 (mod 3)` and `d_k = [p_k` is a nonzero
+cube mod `ℓ]` (the digits of `Real.cubicResidueConstant ℓ b`), `re χ(p_k) = (3 d_k - 1)/2` for
+`p_k ≠ ℓ`, so `Σ_{k<n} re χ(p_k) = (3/2)(#{k < n : d_k = 1} - n/3) + O(1)`. Hence the number of
+cubic residues among the first `n` primes is not `n/3 + O(n^θ)` for any `θ < 1/3`. This follows
+from `not_isBigO_sum_re_rpow_of_pow_three` and the per-digit identity, but it is not a one-line
+corollary in Lean (the per-digit identity, cf. `Real.irrational_cubicResidueConstant`, takes some
+bookkeeping), so it is not stated.

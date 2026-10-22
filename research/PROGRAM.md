@@ -94,3 +94,17 @@ Second-round candidates, by direction: (1) formalize the conditional `m ≥ 4` t
 series with nonnegative coefficients (not in Mathlib); (3) prove `BreuschFour` in Lean, or `P`
 consecutive congruent primes in every `(x, 2x]`; (4) primes in a quadratic progression with the
 existing Euler-product file, and Hecke characters once Mathlib has them.
+
+## Outcomes (second round, Direction 2)
+
+| Result | Lean |
+|---|---|
+| `Σ_{p<x} χ(p) ≠ O(√x/(log x)^A)` for `A > 1` (quadratic `χ`); index scale `A > 1/2`; digit imbalance of `ρ` likewise | `IsQuadratic.not_isBigO_primesBelow_rpow_div_log_rpow`, `not_isBigO_rpow_div_log_rpow`, `RokickiConstant.not_isBigO_card_rokickiDigit_rpow_div_log_rpow` |
+| `S_χ ≠ O(n^{1/3-ε})` for `χ` of order 3, both scales; the bounded case is now the `θ = 0` instance of a `θ`-parametrized engine | `not_isBigO_rpow_one_third_sub_of_pow_three`, `not_isBigO_primesBelow_rpow_of_pow_three` |
+
+Where Direction 2 stops: the dominating series diverges at `A = 1`, and `O(√x/log x)` cannot be
+excluded by this method (the prime-square singularity is the Mellin transform of
+`−½π(√x) ≈ −√x/log x`). The next step is sign-sensitive: `Ω₋(√x/(log x)^A)`, the Chebyshev-bias
+direction, follows from Landau's theorem on Mellin transforms of nonnegative functions (not in
+Mathlib; a self-contained formalization is the natural next task), while `Ω₊` needs a nonreal
+zero of `L(s, χ)` with real part `≥ 1/2` and a twisted kernel (Ingham, Ch. V).

@@ -9,7 +9,13 @@ For each N in 10^4 ... 10^max_exp the script prints
   max_{n <= N} |S(n)| / sqrt(n)   (attained at n = 5, S(5) = -2, for every N >= 10, so also)
   max_{N/10 < n <= N} |S(n)| / sqrt(n)   (where it is attained, and S there),
   max_{x <= p_N} |sum_{p <= x} chi_4(p)| * log(x) / sqrt(x)   (Rubinstein-Sarnak scale),
+  max_{x <= p_N} |sum_{p <= x} chi_4(p)| * log(x)^2 / sqrt(x)   (the log-power refinement
+      proves that this is unbounded, as is the same with log(x)^A for every A > 1),
   the proportion of n <= N with S(n) < 0   (Chebyshev's bias).
+
+A second table gives, for the same N, the location of the (log x)^2 maximum, the same maximum
+with (log x)^1.5, and the index-scale maxima max_{n <= N} |S(n)| (log n)^A / sqrt(n) for
+A = 1/2 and A = 1 (the index-scale threshold of the log-power refinement is A = 1/2).
 
 Usage:  python3 scripts/oscillation.py [max_exp]      (default 7; needs ~200 MB for 7)
 """
@@ -46,17 +52,36 @@ def main():
     x = p.astype(np.float64)
     rs = np.abs(S[1:]) * np.log(x) / np.sqrt(x)
     rs[x < math.e ** 2] = 0.0
+    # log(x)^2 / sqrt(x) is decreasing for x >= e^4
+    rs2 = np.abs(S[1:]) * np.log(x) ** 2 / np.sqrt(x)
+    rs2[x < math.e ** 4] = 0.0
     assert p[-1] == {4: 104723, 5: 1299689, 6: 15485863, 7: 179424673}.get(MAX_EXP, p[-1])
     print(f"{'N':>10} {'max_(n<=N)':>10} {'max_(N/10<n<=N)':>15} {'at n':>10} {'S(n)':>7} "
-          f"{'max |S| log x/sqrt x':>21} {'P(S<0)':>8}")
+          f"{'max |S| log x/sqrt x':>21} {'max |S| log^2 x/sqrt x':>23} {'P(S<0)':>8}")
     for e in range(4, MAX_EXP + 1):
         N = 10 ** e
         m = float(ratio[:N].max())
         i = N // 10 + int(np.argmax(ratio[N // 10:N]))
         j = int(np.argmax(rs[:N]))
+        j2 = int(np.argmax(rs2[:N]))
         neg = float(np.mean(S[1:N + 1] < 0))
         print(f"{N:>10} {m:>10.4f} {ratio[i]:>15.4f} {i + 1:>10} {int(S[i + 1]):>7} "
-              f"{rs[j]:>21.4f} {neg:>8.4f}")
+              f"{rs[j]:>21.4f} {rs2[j2]:>23.4f} {neg:>8.4f}")
+
+    rs15 = np.abs(S[1:]) * np.log(x) ** 1.5 / np.sqrt(x)
+    rs15[x < math.e ** 3] = 0.0
+    nn = n.astype(np.float64)
+    ix = {A: np.abs(S[1:]) * np.log(nn) ** A / np.sqrt(nn) for A in (0.5, 1.0)}
+    for A in ix:
+        ix[A][nn < math.e ** (2 * A) + 1] = 0.0
+    print()
+    print(f"{'N':>10} {'argmax log^2: x':>16} {'S':>7} {'max |S| log^1.5 x/sqrt x':>25} "
+          f"{'max |S(n)| log^0.5 n/sqrt n':>28} {'max |S(n)| log n/sqrt n':>24}")
+    for e in range(4, MAX_EXP + 1):
+        N = 10 ** e
+        j2 = int(np.argmax(rs2[:N]))
+        print(f"{N:>10} {int(p[j2]):>16} {int(S[j2 + 1]):>7} {rs15[:N].max():>25.4f} "
+              f"{ix[0.5][:N].max():>28.4f} {ix[1.0][:N].max():>24.4f}")
 
 
 if __name__ == "__main__":
