@@ -148,3 +148,12 @@ has not yet been asked to do:
    `[a_p(E) < 0]` for CM and non-CM curves, the biases of its partial sums (`√x/(2π)`-type for
    `y² = x³ + x`; Chebyshev-type expected otherwise), irrationality status, and a precise
    conjecture.
+
+## Outcomes (round 4)
+
+| Result | Lean / note |
+|---|---|
+| **Landau's theorem** (Laplace/Mellin and Dirichlet-series forms) and the **direction of the Chebyshev bias**: `Σ_{p<x} χ(p) < −C√x/(log x)^A` infinitely often for every `C`, `A > 1`, quadratic `χ`; no zeros used, Siegel zeros covered; for `ρ`, ones outnumber zeros by more than `C√n/(log n)^A` infinitely often | `exists_lt_integrable_exp_neg_mul`, `IsQuadratic.frequently_re_sum_primesBelow_lt_rpow_div_log_rpow`; `landau.md` |
+| **Parity dichotomy** for unions `A`: the multiplicity relation `Σ c_χ m_χ = (|A| − ν(A))/2`; unconditional for odd `|A|` and by positivity for pairs `{1, a}`, `a` a square; under Chowla for even `|A|` with `ν(A) ≠ |A|`; silent iff `ν(A) = |A|` | `Nat.not_eventuallyPeriodic_nthPrime_mem_of_odd`, `…_of_chowla`; `unions.md` |
+| **Rates**: `π(x; q, a) − π(x)/φ(q) ≠ O(√x/(log x)^β)` for `β > 1`, every class and every odd union; one-sided version only conditional (real zeros have mixed-sign weights for a single class) | `Nat.not_isBigO_card_primesBelow_modEq_sub_rpow_div_log_rpow`; `single-class-rate.md` |
+| **Elliptic curves**: see `elliptic.md` | numerics and conjectures |
