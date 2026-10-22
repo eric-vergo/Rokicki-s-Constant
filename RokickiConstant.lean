@@ -4,9 +4,13 @@ import RokickiConstant.Chi4
 import RokickiConstant.Defs
 import RokickiConstant.EulerProduct
 import RokickiConstant.General.CharacterSums
+import RokickiConstant.General.Diophantine
 import RokickiConstant.General.EulerProduct
 import RokickiConstant.General.Expansion
+import RokickiConstant.General.HigherOrder
 import RokickiConstant.General.Irrational
+import RokickiConstant.General.Lacunary
 import RokickiConstant.General.Normal
+import RokickiConstant.General.Oscillation
 import RokickiConstant.General.ResidueConstant
 import RokickiConstant.PartialSums
