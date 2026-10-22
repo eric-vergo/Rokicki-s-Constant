@@ -1,5 +1,12 @@
 # What replaces the primes: other sequences, other placements (Direction 4)
 
+> **Corrections (second round).** Two statements below have been superseded. (1) The positive
+> bias of the sector digit `[a ≡ 3 (mod 4)]` for `p = a² + b²` is *not* a small-`a` lattice
+> effect: it is an L-function effect of order `√x/(2π)` spread over all lines, with two independent
+> derivations of the constant; see `research/gaussian-primes.md`. (2) The single-class indicator
+> `[p_k ≡ a (mod q)]` is now proved non-periodic for every `q ≥ 3` and every unit `a`, including the
+> classes where the prime-square coefficient was thought to vanish; see `research/single-class.md`.
+
 **Status.**
 
 * **Formalized** (`RokickiConstant/General/Lacunary.lean`, no `sorry`, standard axioms only):

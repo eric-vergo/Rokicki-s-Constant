@@ -15,4 +15,5 @@ import RokickiConstant.General.Normal
 import RokickiConstant.General.Oscillation
 import RokickiConstant.General.ResidueConstant
 import RokickiConstant.General.SingleClass
+import RokickiConstant.General.TwoSquares
 import RokickiConstant.PartialSums

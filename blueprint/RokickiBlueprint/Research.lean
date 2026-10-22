@@ -9,6 +9,9 @@ import RokickiConstant.General.HigherOrder
 import RokickiConstant.General.Oscillation
 import RokickiConstant.General.Diophantine
 import RokickiConstant.General.Lacunary
+import RokickiConstant.General.SingleClass
+import RokickiConstant.General.Beatty
+import RokickiConstant.General.TwoSquares
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -152,4 +155,92 @@ transcendental number.
 Infinitely many primes are $`3` modulo $`4`, so infinitely many digits are $`1`; Liouville
 numbers are transcendental. What blocks transcendence for $`\rho` itself is the dense placement
 of the same digits, not the digits.
+:::
+
+# The sequence: a single residue class
+
+:::theorem "single_class" (lean := "Nat.not_eventuallyPeriodic_nthPrime_modEq, Real.irrational_classConstant")
+For every modulus $`q \geq 3` and every $`a` coprime to $`q`, the indicator sequence
+$`[p_k \equiv a \pmod q]` of a single residue class is not eventually periodic; hence the number
+whose $`k`-th base-$`b` digit is this indicator is irrational, for every $`b \geq 2`.
+:::
+
+:::proof "single_class" (uses := "general_euler_product, general_prime_power_part_analytic, abel_series_holomorphic, general_irrational_of_not_periodic, periodic_partial_sums")
+Periodicity forces $`\#\{k<n : p_k \equiv a\} = c\,n + O(1)`; the nonvanishing of every
+$`L(1,\chi)` forces $`c = 1/\varphi(q)` (Dirichlet density, without the prime number theorem).
+Then $`\Phi = \sum_{\chi \neq 1} \bar\chi(a)(G_\chi + H_\chi)` continues to
+$`\operatorname{Re} s > 1/2`, with $`(\prod_\chi L_\chi)\,\Phi' = \sum_\chi \bar\chi(a) L_\chi' \prod_{\psi \neq \chi} L_\psi`
+there by the identity theorem. Near $`1/2` on the real axis,
+$`\Phi(\sigma) = x \log(\sigma - 1/2) + O(1)` with $`x = \sum_\chi \bar\chi(a)\, m_\chi`, where $`m_\chi`
+is the order of vanishing of $`L(\cdot,\chi)` at $`1/2`; the prime squares give instead
+$`\Phi(\sigma) = \tfrac{1-\nu}{2} \log(\sigma - 1/2) + O(1)` with $`\nu` the number of square roots
+of $`a` modulo $`q`. So $`x = (1-\nu)/2`. But $`x` is an algebraic integer and $`\nu` is even for
+$`q \geq 3`: no configuration of zeros at $`1/2` can rescue periodicity.
+:::
+
+:::theorem "rokicki_third_proof" (lean := "Real.classConstant_four_three_two, Real.irrational_rokickiConstant''") (uses := "rokicki_constant")
+The single-class constant of $`q = 4`, $`a = 3` in base $`2` equals $`\rho/2`; this gives a
+third proof that Rokicki's constant is irrational.
+:::
+
+:::proof "rokicki_third_proof" (uses := "single_class")
+The term $`k = 0` vanishes ($`p_0 = 2`) and the remaining digits are Rokicki's digits shifted by
+one position.
+:::
+
+# The sequence: Beatty sequences
+
+:::theorem "beatty" (lean := "Int.not_eventuallyPeriodic_floor_mul_emod, Real.irrational_beattyConstant")
+For irrational $`\alpha`, $`m \geq 2` and any residue $`a`, the digits $`[\lfloor k\alpha \rfloor \equiv a \pmod m]`
+are not eventually periodic, and the Beatty–Rokicki constant $`\sum_k d_k / b^{k+1}` is irrational
+for every $`b \geq 2`; for rational $`\alpha` it is rational.
+:::
+
+:::proof "beatty" (uses := "general_irrational_of_not_periodic")
+The digit is the coding of the rotation by $`\alpha/m` on the circle by an arc of length $`1/m`.
+Along a progression $`N + tP` the rotation by $`P\alpha/m` is still irrational, so its orbit meets
+every arc (Dirichlet's approximation theorem); hence the digit cannot be constant along the
+progression, which eventual periodicity would require. These constants are in fact
+transcendental by Adamczewski–Bugeaud, since the coding has linear subword complexity.
+:::
+
+# The sequence: squarefree numbers and sums of two squares
+
+:::theorem "squarefree_patterns" (lean := "Nat.exists_squarefreeNth_mod_four_eq")
+Every finite word over the residues $`\{1, 2, 3\}` modulo $`4` occurs, arbitrarily late, as the
+residues of consecutive squarefree numbers.
+:::
+
+:::proof "squarefree_patterns"
+By the Chinese remainder theorem, place the prescribed residues in an arithmetic progression
+whose step is a square of a factorial, kill every other integer of the window by the square of
+its own large prime, and bound the candidates lost to larger prime squares by a union bound
+with $`\sum_{n > K} n^{-2} \leq 2/(K+1)`; half of the progression survives. This is an
+elementary stand-in for Mirsky's pattern counts.
+:::
+
+:::theorem "squarefree_constant" (lean := "Nat.not_eventuallyPeriodic_squarefreeNth_mod_four, Real.irrational_squarefreeConstant") (uses := "general_irrational_of_not_periodic")
+The residues modulo $`4` of the consecutive squarefree numbers are not eventually periodic, so
+every constant whose digits distinguish two of the residues $`1, 2, 3` is irrational.
+:::
+
+:::proof "squarefree_constant" (uses := "squarefree_patterns")
+An eventually periodic sequence with period $`P` has at most $`P` factors of each length, while
+all $`3^L` words occur.
+:::
+
+:::theorem "two_squares_constants" (lean := "Real.irrational_sumTwoSqSquareConstant, Real.irrational_sumTwoSqPrimeConstant, Real.irrational_sumTwoSqParityConstant_of_landau") (uses := "general_irrational_of_not_periodic")
+Over the sums of two squares $`s_0 < s_1 < \cdots`, the digits $`[s_k \text{ is a square}]` and
+$`[s_k \text{ is prime}]` give irrational constants unconditionally; the parity digit
+$`[s_k \text{ odd}]` gives an irrational constant assuming Landau's asymptotic
+$`B(x) \sim K x / \sqrt{\log x}` for the counting function of sums of two squares.
+:::
+
+:::proof "two_squares_constants"
+Arbitrarily long runs of the digit $`0` exist for the first two digits (no square between
+consecutive squares; windows $`t^2 + 2, \ldots, t^2 + R` with $`R! \mid t` contain no prime), and the
+digit $`1` recurs infinitely often (Fermat). For the parity digit, the self-similarity
+$`2n \in S \Leftrightarrow n \in S` gives $`B(2n) = \#\{\text{odd } s \leq 2n\} + B(n)`, so periodicity
+would force $`B(n) = (1-c) B(2n) + O(1)`; Landau's asymptotic forces $`c = 1/2` and then
+$`B(2^j n_0) \geq 2^j`, contradicting density zero.
 :::

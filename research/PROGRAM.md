@@ -108,3 +108,20 @@ excluded by this method (the prime-square singularity is the Mellin transform of
 direction, follows from Landau's theorem on Mellin transforms of nonnegative functions (not in
 Mathlib; a self-contained formalization is the natural next task), while `Ω₊` needs a nonreal
 zero of `L(s, χ)` with real part `≥ 1/2` and a twisted kernel (Ingham, Ch. V).
+
+## Outcomes (third round, Direction 4)
+
+| Result | Lean / note |
+|---|---|
+| **Single-class theorem**: for every `q ≥ 3` and every unit `a`, `[p_k ≡ a (mod q)]` is not eventually periodic, so `Σ [p_k ≡ a]/b^(k+1)` is irrational in every base; a third proof for `ρ` (`classConstant 4 3 2 = ρ/2`). New mechanism: zeros of `L(·,χ)` at `1/2` contribute an algebraic integer `Σ χ̄(a) m_χ` to the `log(σ − 1/2)` coefficient, while the prime squares demand `(1 − ν(a))/2` with `ν(a)` even. | `Nat.not_eventuallyPeriodic_nthPrime_modEq`, `Real.irrational_classConstant`; `single-class.md` |
+| Beatty sequences: `[⌊kα⌋ ≡ a (mod m)]` non-periodic for irrational `α`, rational for rational `α`; the constants are irrational (and transcendental by Adamczewski–Bugeaud, not formalizable) | `Int.not_eventuallyPeriodic_floor_mul_emod`, `Real.irrational_beattyConstant`; `beatty.md` |
+| Squarefree numbers: every residue word mod 4 occurs among consecutive squarefree numbers (CRT + union bound); every squarefree residue constant is irrational | `Nat.exists_squarefreeNth_mod_four_eq`, `Real.irrational_squarefreeConstant`; `two-squares-squarefree.md` |
+| Sums of two squares: the square and prime digits give irrational constants unconditionally; the parity digit conditionally on Landau's `B(x) ~ Kx/√log x` | `Real.irrational_sumTwoSq{Square,Prime}Constant`, `..._sumTwoSqParityConstant_of_landau` |
+| Gaussian primes: the sector digit `[a ≡ 3 (mod 4)]` for `p = a² + b²` is `χ₈(p)·sgn(Re π₀)`, not a Dirichlet digit; its partial sums are biased positive with `S(x) ~ √x/(2π)` (two derivations), the race of Devin's Conjecture 1.2; irrationality open (needs infinitely many Hecke modes) | `gaussian-primes.md`, `scripts/gaussian_primes.py` |
+
+Where the method transfers (now a theorem, not a heuristic): to any digit cut out by a *single
+residue class* of the primes, by the integrality mechanism; to quadratic and cubic digits by the
+prime-square and prime-cube terms; to rotation codings by Diophantine approximation; to
+squarefree residues by sieve constructions. Where it does not: digits that are infinite
+combinations of Hecke modes (the Gaussian sector digit), and unions of residue classes with
+`ν(A) = |A|`.
