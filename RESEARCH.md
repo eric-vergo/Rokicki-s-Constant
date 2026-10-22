@@ -107,6 +107,9 @@ statistics; reproduced by `scripts/transcendence_evidence.py`).
 | `RokickiConstant/General/Irrational.lean` | irrationality of `Σ f(χ(p_k)) / b^{k+1}`; Rokicki's constant in every base; Legendre constants |
 | `RokickiConstant/General/ResidueConstant.lean` | a nonprincipal quadratic character exists for every `q ≥ 3`; the residue constants are irrational |
 | `RokickiConstant/General/Normal.lean` | normality definitions; `ρ` is normal in base 2 if consecutive-prime residue patterns mod 4 are equidistributed |
+| `research/PROGRAM.md` | the four-direction research program and its outcomes |
 | `research/transcendence.md` | the transcendence question: criteria, obstructions, directions |
+| `research/higher-order.md`, `research/oscillation.md`, `research/diophantine.md`, `research/sequences.md` | notes of the four directions |
+| `RokickiConstant/General/HigherOrder.lean`, `Oscillation.lean`, `Diophantine.lean`, `Lacunary.lean` | their formalizations |
 | `research/transcendence-evidence.md` | computational evidence (PSLQ, continued fractions, digits) |
 | `scripts/transcendence_evidence.py` | reproduces the evidence |

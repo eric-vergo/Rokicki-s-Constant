@@ -79,3 +79,18 @@ Directions 1 and 2 are run first (both are extensions of the formal development 
 same analytic core); directions 3 and 4 second (both open outward, to Diophantine approximation
 and to other sequences). Each produces a note in `research/` and, where marked, Lean under
 `RokickiConstant/General/`.
+
+## Outcomes (first round)
+
+| Direction | Formalized (Lean, no sorry, standard axioms) | Note |
+|---|---|---|
+| 1 | `DirichletCharacter.not_exists_norm_sum_sub_mul_le` (linear case, every nonprincipal `χ`, complex slope); `not_exists_norm_sum_le_of_pow_three` (order 3: unbounded, even the real parts); `Real.irrational_cubicResidueConstant`; simultaneous theorem `not_forall_exists_norm_sum_pow_le` for order `m` | `higher-order.md`: why `m ≥ 4` needs zeros of `L(·, χ^j)`; conditional theorem for squarefree `m`; cancellation for `m = 4, 8, 9` |
+| 2 | `IsQuadratic.not_isBigO_rpow_one_half_sub` and the `x`-scale `not_isBigO_primesBelow_rpow`; `RokickiConstant.not_isBigO_card_rokickiDigit_rpow` | `oscillation.md`: exponent `1/2` is the edge of absolute convergence of `χ²`; upper bounds are GRH; one-sided `Ω₋` would need Landau's theorem |
+| 3 | `Nat.primeCounting_two_mul_le` (`π(2x) ≤ 28 π(x)`, unconditional); `one_div_two_pow_le_abs_tsum_sub_div_two_pow` (digits vs dyadic approximation); conditional on `BreuschFour`: `|ρ − a/2^m| ≥ 2^{-(28m+55)}` | `diophantine.md`: exact reduction approximations ⇔ periodic stretches; evidence for `μ(ρ) = 2` along `2^n(2^P − 1)`; Breusch formalization estimated at 2000–4000 lines |
+| 4 | `liouville_tsum_div_pow_factorial`; `Real.transcendental_rokickiLacunary` (Rokicki's digits at factorial positions) | `sequences.md`: classification of fifteen Rokicki-type constants; the method transfers exactly to progressions cut out by quadratic characters (the prime-square term) and fails where no prime square lies in the class |
+
+Second-round candidates, by direction: (1) formalize the conditional `m ≥ 4` theorem, and
+`S_χ ≠ O(n^{1/3-ε})` for cubic `χ`; (2) the one-sided `Ω₋` via Landau's theorem on Dirichlet
+series with nonnegative coefficients (not in Mathlib); (3) prove `BreuschFour` in Lean, or `P`
+consecutive congruent primes in every `(x, 2x]`; (4) primes in a quadratic progression with the
+existing Euler-product file, and Hecke characters once Mathlib has them.
