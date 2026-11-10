@@ -58,6 +58,12 @@ ProofWidgets and Plausible entries of `lake-manifest.json` did not change.
 
 ## Writing
 
+The chapter files are ordinary (non-`module`) Lean files, unlike the development. A module may only
+import modules, and Verso Blueprint (`VersoBlueprint`) is not one yet at this version. Also, a
+non-module file sees the proofs of the modules it imports, which lets the blueprint check that
+the linked declarations are free of `sorry`. A module importing them normally would only see their
+statements.
+
 `blueprint/RokickiBlueprint/RokickiConstant.lean` contains a worked example: a definition and a
 theorem, both linked to Lean declarations with `(lean := "...")`, and a dependency `{uses "..."}[]`
 between them. The status colours of the graph are computed from the linked Lean declarations

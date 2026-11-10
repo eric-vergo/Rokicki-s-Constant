@@ -3,10 +3,12 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.NumberTheory.DirichletCharacter.Basic
-import Mathlib.NumberTheory.SumPrimeReciprocals
-import RokickiConstant.Defs
-import RokickiConstant.PartialSums
+module
+
+public import Mathlib.NumberTheory.DirichletCharacter.Basic
+public import Mathlib.NumberTheory.SumPrimeReciprocals
+public import RokickiConstant.Defs
+public import RokickiConstant.PartialSums
 
 /-!
 # The character `χ₄` at the odd primes
@@ -35,6 +37,8 @@ term at `2` plus a sum over the odd primes, `∑ₖ pₖ₊₂ ^ (-σ)` converge
 
 Dirichlet character, primes modulo 4
 -/
+
+@[expose] public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false

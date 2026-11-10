@@ -3,8 +3,11 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
+module
+
+public import RokickiConstant.EulerProduct
+
 import Mathlib.NumberTheory.LSeries.Nonvanishing
-import RokickiConstant.EulerProduct
 
 /-!
 # The character sums `∑ χ₄ p` over primes are neither bounded nor linear
@@ -47,6 +50,8 @@ arithmetic progressions.
 
 Dirichlet character, L-function, Euler product, Chebyshev bias
 -/
+
+public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
