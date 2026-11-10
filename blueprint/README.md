@@ -3,8 +3,8 @@
 The blueprint of this project is written with
 [Verso Blueprint](https://github.com/leanprover/verso-blueprint), the Verso-based successor of
 `leanblueprint`. It is pinned in `lakefile.toml` to commit
-`a1cf70667112dcffe15faea9f8783e63dd9644e8` (head of its `v4.34.0` release branch, built for Lean
-`v4.34.1`), which in turn pins Verso, SubVerso and verso-slides.
+`4943d3335ffa9221a39949e60836a8ad5dc2a456` (head of its `v4.35.0` release branch, built for Lean
+`v4.35.0`), which in turn pins Verso, SubVerso and verso-slides.
 
 ## Layout
 
@@ -62,5 +62,5 @@ ProofWidgets and Plausible entries of `lake-manifest.json` did not change.
 theorem, both linked to Lean declarations with `(lean := "...")`, and a dependency `{uses "..."}[]`
 between them. The status colours of the graph are computed from the linked Lean declarations
 (complete, contains `sorry`, missing); there is no manual `\leanok`. See the
-[manual](https://github.com/leanprover/verso-blueprint/blob/v4.34.0/doc/MANUAL.md) for the full
+[manual](https://github.com/leanprover/verso-blueprint/blob/v4.35.0/doc/MANUAL.md) for the full
 syntax.
