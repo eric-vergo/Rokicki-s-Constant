@@ -45,6 +45,12 @@ function `L(·, χ₄)` stays bounded.
 | `blueprint/` | the Verso blueprint: introduction, chapters, dependency graph |
 | `scripts/rho.py` | numerical reference computation of `ρ` |
 
+The files of `RokickiConstant/` and `Comparator/` are Lean
+[modules](https://lean-lang.org/doc/reference/latest/Source-Files-and-Modules/#module-scopes), as
+in Mathlib: `module`, `public import` for what the statements need (`import` for what only the
+proofs need), and `@[expose] public section` in the files with definitions, so that their bodies
+unfold in downstream proofs. The blueprint chapters are not modules; see `blueprint/README.md`.
+
 ## Comparator
 
 `Comparator/Challenge.lean` states the problem in the most direct terms, with no reference to the

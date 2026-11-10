@@ -3,7 +3,9 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Challenge: Rokicki's constant is irrational
@@ -16,6 +18,8 @@ irrational.
 The solution is in `Comparator/Solution.lean`, which differs from this file only in its imports
 and in the proof of `rho_irrational`.
 -/
+
+@[expose] public section
 
 /-- **Rokicki's constant** `ρ = ∑ₖ [pₖ₊₂ ≡ 3 (mod 4)] / 2 ^ (k + 1)`. -/
 noncomputable def rho : ℝ :=

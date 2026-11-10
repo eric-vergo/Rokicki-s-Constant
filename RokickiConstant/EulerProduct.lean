@@ -3,8 +3,10 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.NumberTheory.LSeries.DirichletContinuation
-import RokickiConstant.Chi4
+module
+
+public import Mathlib.NumberTheory.LSeries.DirichletContinuation
+public import RokickiConstant.Chi4
 
 /-!
 # The Euler product of `L(s, χ₄)`
@@ -46,6 +48,8 @@ The consequences for the partial sums of `χ₄` over the primes are drawn in
 
 Dirichlet character, L-function, Euler product
 -/
+
+@[expose] public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
