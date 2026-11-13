@@ -57,6 +57,11 @@ Neither argument uses the prime number theorem, nor Dirichlet's theorem on prime
 progressions. The second argument is the heart of the proof: it shows that $`\sum_{p \leq x} \chi_4(p)`
 is unbounded, a weak form of the Chebyshev bias phenomenon, with elementary tools.
 
+{ref "chapter-prime-number-theorem"}[The last chapter] gives a second proof, in which the case
+$`c \neq 0` is ruled out by the prime number theorem in arithmetic progressions instead: the
+primes are equidistributed between the classes $`1` and $`3` modulo $`4`, which forces $`c = 0`.
+The case $`c = 0` is the same in both proofs.
+
 # Reading guide
 
 {ref "chapter-rokicki-constant"}[The next chapter] defines $`\rho` and its digits.
@@ -65,7 +70,9 @@ is unbounded, a weak form of the Chebyshev bias phenomenon, with elementary tool
 eventually periodic sequences, summation by parts, and the Abel series.
 {ref "chapter-euler-product"}[Chapter 5] sets up $`\chi_4` and the Euler product.
 {ref "chapter-character-sums"}[Chapter 6] draws the two contradictions, and
-{ref "chapter-main-theorem"}[Chapter 7] assembles the main theorem. Every statement is formalized;
+{ref "chapter-main-theorem"}[Chapter 7] assembles the main theorem.
+{ref "chapter-prime-number-theorem"}[Chapter 8] is the second proof, by the prime number theorem
+in arithmetic progressions. Every statement is formalized;
 the dependency graph at the end records which results each proof uses.
 
 # The formal statement
