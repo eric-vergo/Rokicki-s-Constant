@@ -86,7 +86,8 @@ elaborates the challenge alone and reports its one intentional `sorry`.
 
 The second proof is the library `RokickiConstantPNT`, which is not a default target:
 `lake build RokickiConstantPNT` builds it, together with the vendored part of
-PrimeNumberTheoremAnd it imports (a few minutes). The build has no `sorry` and no warnings, and
+PrimeNumberTheoremAnd it imports (a few minutes). The build has no `sorry`, its only warnings are
+Lake's notes that the vendored files are not written for the module system, and
 `#print axioms RokickiConstant.PNT.rho_irrational` reports only `propext`, `Classical.choice` and
 `Quot.sound`.
 
@@ -100,15 +101,30 @@ that is kept is modified. See [`vendor/README.md`](vendor/README.md).
 
 ## Blueprint
 
-The project has a [Verso blueprint](blueprint/README.md): an introduction, one chapter per file of
-the development, a chapter for the second proof, and a dependency graph covering both proofs whose nodes are linked to the Lean declarations and
-coloured by their formalization status. Build and serve it locally with
+The blueprint is published at **<https://eric-vergo.github.io/Rokicki-s-Constant/>**.
+
+It is a [Verso blueprint](blueprint/README.md): an introduction, one chapter per file of the
+development, a chapter for the second proof, a dependency graph covering both proofs whose nodes
+are linked to the Lean declarations and coloured by the status of their Lean code, and a Project
+Stats page. Each statement is shown beside the Lean source of its declarations. The site is built
+with the fork [eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) at commit
+`a370d5a8771e0351ac9bb4194a3fbf1f2c733191` (pinned in `lakefile.toml`).
+
+The status marks and counts on the site are about the Lean code only: they say whether the linked
+Lean declarations, and what they use, are free of `sorry`, as read from the build the site was
+generated from. No tool checks that an informal statement says the same as its Lean statement.
+
+To build and serve it locally, from the repository root:
 
 ```bash
-lake exe vbp build --serve
+lake exe cache get            # Mathlib's prebuilt files
+lake build                    # the development and the comparator solution
+lake exe vbp build --serve    # the site, served at http://localhost:8000
 ```
 
-and open <http://localhost:8000>. The first build compiles Verso, which takes a few minutes.
+The first site build compiles Verso and Verso Blueprint, which takes several minutes. The site is
+written to `_out/site/html-multi/`. GitHub Actions (`.github/workflows/blueprint.yml`) rebuilds and
+publishes it on every push to `main`.
 
 ## Building
 
