@@ -20,3 +20,6 @@ def main (args : List String) : IO UInt32 :=
     (%doc RokickiBlueprint)
     args
     (extensionImpls := by exact extension_impls%)
+    (sideBySide := true)
+    (sidebar? := some { links := #[
+      { label := "GitHub", href := "https://github.com/eric-vergo/Rokicki-s-Constant" }] })
