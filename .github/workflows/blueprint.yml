@@ -1,69 +1,81 @@
-# Build the Verso blueprint and publish it to GitHub Pages.
-# Adapted from the verso-blueprint project template. To enable, set the repository's
-# Pages source to "GitHub Actions" (Settings → Pages).
+# Build the project and its Verso blueprint, and publish the site to GitHub Pages.
+# Pages must use "GitHub Actions" as its source (Settings → Pages).
 name: Blueprint
 
 on:
   push:
     branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# One run per branch at a time; a run that is deploying is never cancelled.
 concurrency:
-  group: ${{ github.repository }}-blueprint-pages-${{ github.ref }}
-  cancel-in-progress: true
+  group: blueprint-pages-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build blueprint site
+    name: Build the project and the blueprint site
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/configure-pages@v6
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
       - name: Install elan
         run: |
-          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          curl -sSfL -o elan-init.sh \
+            https://raw.githubusercontent.com/leanprover/elan/227caca133724d5516bee25c2aeb3e609478f2d8/elan-init.sh
+          sh elan-init.sh -y --default-toolchain none
+          rm elan-init.sh
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Restore Lake package cache
-        uses: actions/cache@v5
+
+      - name: Install the project's toolchain
+        run: |
+          elan toolchain install "$(cat lean-toolchain)"
+          lean --version
+          lake --version
+
+      - name: Restore Lake packages
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
-          path: |
-            .lake/packages
-          key: ${{ runner.os }}-lake-packages-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
-          restore-keys: |
-            ${{ runner.os }}-lake-packages-v1-
-      - name: Restore root Lean build cache
-        uses: actions/cache@v5
+          path: .lake/packages
+          key: ${{ runner.os }}-lake-packages-v2-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
+
+      - name: Restore the project's build
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
-          path: |
-            .lake/build/lib
-            .lake/build/ir
-          key: ${{ runner.os }}-lean-build-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml', '**/*.lean', 'scripts/ci-pages.sh') }}
+          path: .lake/build
+          key: ${{ runner.os }}-lake-build-v2-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-${{ hashFiles('*.lean', 'RokickiConstant/**', 'RokickiConstantPNT/**', 'Comparator/**', 'blueprint/**', 'vendor/**') }}
           restore-keys: |
-            ${{ runner.os }}-lean-build-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-
-            ${{ runner.os }}-lean-build-v1-
-      - name: Get Mathlib cache
+            ${{ runner.os }}-lake-build-v2-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-
+
+      - name: Get Mathlib's prebuilt cache
         run: lake exe cache get
-      - name: Build blueprint site
+
+      - name: Build the project and the blueprint site
         run: ./scripts/ci-pages.sh
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _out/site/html-multi
 
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -3,8 +3,11 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
+module
+
+public import Mathlib.NumberTheory.Real.Irrational
+
 import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.NumberTheory.Real.Irrational
 
 /-!
 # Rational numbers have eventually periodic binary expansions
@@ -37,6 +40,8 @@ tail equal to `1` means all later digits are `1`. Hence `d i = d j`, and inducti
 
 binary expansion, eventually periodic, irrational
 -/
+
+@[expose] public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false

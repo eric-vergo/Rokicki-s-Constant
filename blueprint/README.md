@@ -2,15 +2,20 @@
 
 The blueprint of this project is written with
 [Verso Blueprint](https://github.com/leanprover/verso-blueprint), the Verso-based successor of
-`leanblueprint`. It is pinned in `lakefile.toml` to commit
-`a1cf70667112dcffe15faea9f8783e63dd9644e8` (head of its `v4.34.0` release branch, built for Lean
-`v4.34.1`), which in turn pins Verso, SubVerso and verso-slides.
+`leanblueprint`, in the version of the fork
+[eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) (branch `v4.35.0`,
+for Lean `v4.35.0`). The fork adds the side-by-side layout (each statement beside the Lean source
+of its declarations, with the prose proof and the Lean proof opened by one toggle), formulas
+typeset when the site is built, a Project Stats page and a headline card for the Comparator
+challenge. `lakefile.toml` pins it to commit `a370d5a8771e0351ac9bb4194a3fbf1f2c733191`, together
+with the fork of Verso at `ea2e2ab37a41e50bbff0787ba896c55ea3d39df1` and the fork of SubVerso at
+`f53c070f0357f5dcf3b03b8924deb714294dac69`; the published site is built with these commits.
 
 ## Layout
 
 | File | Role |
 |---|---|
-| `BlueprintMain.lean` (repository root) | generator entry point; `lake exe vbp build` finds it there |
+| `BlueprintMain.lean` (repository root) | generator entry point; `lake exe vbp build` finds it there. It turns on the side-by-side layout and adds a link to this repository to the sidebar |
 | `blueprint/RokickiBlueprint.lean` | top-level document: title, chapter list, dependency graph, progress summary |
 | `blueprint/RokickiBlueprint/*.lean` | one module per chapter |
 
@@ -34,8 +39,8 @@ python3 -m http.server --directory _out/site/html-multi 8000
 ```
 
 then open <http://localhost:8000>. (Opening `index.html` directly from disk does not work well:
-the previews and the graph load data with `fetch`.) The dependency graph and the progress summary
-are pages of the site.
+the previews and the graph load data with `fetch`.) The dependency graph, the progress summary and
+the Project Stats page are pages of the site.
 
 Other useful commands:
 
@@ -47,20 +52,38 @@ lake exe vbp check            # check the consistency of the generated site
 lake exe vbp build --pdf      # also build _out/site/pdf/main.pdf (needs lualatex)
 ```
 
-`_out/` is ignored by git. The graph page draws the graph in the browser with `d3-graphviz`
-loaded from `cdn.jsdelivr.net`, so viewing it needs network access (no local Graphviz is needed).
+`_out/` is ignored by git. The site needs no network access when it is viewed: its scripts,
+styles and fonts are part of it, and every link inside it is relative, so it also works from a
+sub-path such as the GitHub Pages address.
 
-`require mathlib` comes after `require VersoBlueprint` in `lakefile.toml` on purpose: the last
+`require mathlib` comes after the blueprint requirements in `lakefile.toml` on purpose: the last
 requirement's pins of shared dependencies (ProofWidgets, Plausible) win, which keeps them equal to
-Mathlib's and keeps `lake exe cache get` working. Update the blueprint tool with
-`lake update VersoBlueprint` after changing its `rev`, and check afterwards that the Mathlib,
-ProofWidgets and Plausible entries of `lake-manifest.json` did not change.
+Mathlib's and keeps `lake exe cache get` working. `subverso` and `verso` are required before
+`VersoBlueprint` so that the workspace uses the forks' commits named above. To move the blueprint
+tool to a newer commit, change the `rev` of `VersoBlueprint` (and, if its own `lake-manifest.json`
+asks for them, those of `verso` and `subverso`), run `lake update VersoBlueprint verso subverso`,
+and check afterwards that the Mathlib, ProofWidgets and Plausible entries of `lake-manifest.json`
+did not change.
+
+## Publishing
+
+`.github/workflows/blueprint.yml` builds the project and the site on every push to `main` (and
+when started by hand from the Actions tab) and publishes the site with GitHub Pages at
+<https://eric-vergo.github.io/Rokicki-s-Constant/>. It runs `scripts/ci-pages.sh`, which builds the
+default targets, `ComparatorChallenge` and `RokickiConstantPNT`, then the site, and fails when a
+build fails or `lake exe vbp check` reports a problem with the generated site.
 
 ## Writing
+
+The chapter files are ordinary (non-`module`) Lean files, unlike the development. A module may only
+import modules, and Verso Blueprint (`VersoBlueprint`) is not one yet at this version. Also, a
+non-module file sees the proofs of the modules it imports, which lets the blueprint check that
+the linked declarations are free of `sorry`. A module importing them normally would only see their
+statements.
 
 `blueprint/RokickiBlueprint/RokickiConstant.lean` contains a worked example: a definition and a
 theorem, both linked to Lean declarations with `(lean := "...")`, and a dependency `{uses "..."}[]`
 between them. The status colours of the graph are computed from the linked Lean declarations
 (complete, contains `sorry`, missing); there is no manual `\leanok`. See the
-[manual](https://github.com/leanprover/verso-blueprint/blob/v4.34.0/doc/MANUAL.md) for the full
+[manual](https://github.com/leanprover/verso-blueprint/blob/v4.35.0/doc/MANUAL.md) for the full
 syntax.

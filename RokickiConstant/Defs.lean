@@ -3,9 +3,11 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.NumberTheory.LegendreSymbol.ZModChar
-import Mathlib.NumberTheory.PrimeCounting
-import RokickiConstant.BinaryExpansion
+module
+
+public import Mathlib.NumberTheory.LegendreSymbol.ZModChar
+public import Mathlib.NumberTheory.PrimeCounting
+public import RokickiConstant.BinaryExpansion
 
 /-!
 # Rokicki's constant
@@ -44,6 +46,8 @@ The irrationality of `ρ` is proved in `Comparator/Solution.lean`.
 
 Rokicki's constant, primes modulo 4, binary expansion, irrational
 -/
+
+@[expose] public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
