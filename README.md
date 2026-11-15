@@ -108,7 +108,7 @@ development, a chapter for the second proof, a dependency graph covering both pr
 are linked to the Lean declarations and coloured by the status of their Lean code, and a Project
 Stats page. Each statement is shown beside the Lean source of its declarations. The site is built
 with the fork [eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) at commit
-`a370d5a8771e0351ac9bb4194a3fbf1f2c733191` (pinned in `lakefile.toml`).
+`10e889c1fd8ce6cab08a450ea1247feff775d0d7` (pinned in `lakefile.toml`).
 
 The status marks and counts on the site are about the Lean code only: they say whether the linked
 Lean declarations, and what they use, are free of `sorry`, as read from the build the site was
