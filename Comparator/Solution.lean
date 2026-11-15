@@ -3,7 +3,10 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib
+module
+
+public import Mathlib
+
 import RokickiConstant.CharacterSums
 
 /-!
@@ -24,6 +27,8 @@ bounded (`RokickiConstant.not_exists_abs_sum_chi4_le`) nor linear with nonzero s
 (`RokickiConstant.not_exists_abs_sum_chi4_sub_mul_le`), by the Euler product of `L(s, χ₄)`.
 The proof does not use the prime number theorem.
 -/
+
+@[expose] public section
 
 /-- **Rokicki's constant** `ρ = ∑ₖ [pₖ₊₂ ≡ 3 (mod 4)] / 2 ^ (k + 1)`. -/
 noncomputable def rho : ℝ :=

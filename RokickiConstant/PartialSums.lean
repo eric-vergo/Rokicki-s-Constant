@@ -3,10 +3,14 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Mathlib.Analysis.Complex.LocallyUniformLimit
-import Mathlib.Analysis.PSeries
-import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
-import RokickiConstant.BinaryExpansion
+module
+
+public import Mathlib.Analysis.Complex.LocallyUniformLimit
+public import Mathlib.Analysis.PSeries
+public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+public import RokickiConstant.BinaryExpansion
+
+import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 
 /-!
 # Partial sums of eventually periodic sequences and summation by parts
@@ -40,6 +44,8 @@ This file collects the elementary real-variable input to the irrationality of Ro
 
 summation by parts, Abel summation, eventually periodic, Dirichlet series
 -/
+
+@[expose] public section
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
