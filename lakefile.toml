@@ -33,7 +33,7 @@ rev = "ea2e2ab37a41e50bbff0787ba896c55ea3d39df1"
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint"
-rev = "a370d5a8771e0351ac9bb4194a3fbf1f2c733191"
+rev = "10e889c1fd8ce6cab08a450ea1247feff775d0d7"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
 # take precedence over VersoBlueprint's when Lake resolves the workspace.
