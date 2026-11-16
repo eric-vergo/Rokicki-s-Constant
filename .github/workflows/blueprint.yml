@@ -54,8 +54,23 @@ jobs:
       - name: Get Mathlib's prebuilt cache
         run: lake exe cache get
 
+      # The kernel replay of the blueprint site's build (`lake exe vbp build`) holds several
+      # modules' worth of data in one checker process; give it swap beyond the runner's memory.
+      - name: Add swap
+        run: |
+          sudo fallocate -l 32G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -m
+          (while true; do date -u +%T; free -m | sed -n 2,3p; sleep 30; done > /tmp/memory.log 2>&1 &)
+
       - name: Build the project and the blueprint site
         run: ./scripts/ci-pages.sh
+
+      - name: Memory use during the build
+        if: always()
+        run: cat /tmp/memory.log || true
 
       - name: Upload the site
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
