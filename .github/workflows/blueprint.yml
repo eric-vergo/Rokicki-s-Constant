@@ -54,6 +54,17 @@ jobs:
       - name: Get Mathlib's prebuilt cache
         run: lake exe cache get
 
+      # The kernel replay of the site build (`lake exe vbp build`) keeps the data of all the
+      # replayed modules in one checker process, about 30 GB at its peak: more than the
+      # runner's memory, so give it swap.
+      - name: Add swap
+        run: |
+          sudo fallocate -l 32G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -m
+
       - name: Build the project and the blueprint site
         run: ./scripts/ci-pages.sh
 
