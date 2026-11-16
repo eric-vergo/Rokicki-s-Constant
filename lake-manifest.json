@@ -19,10 +19,10 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "c6d8f2becad78f028d361d11608221a1e5fa2ac2",
+   "rev": "ad8f5d029a92605a80500363344637dc9320a941",
    "name": "VersoBlueprint",
    "manifestFile": "lake-manifest.json",
-   "inputRev": "c6d8f2becad78f028d361d11608221a1e5fa2ac2",
+   "inputRev": "ad8f5d029a92605a80500363344637dc9320a941",
    "inherited": false,
    "configFile": "lakefile.lean"
   },
