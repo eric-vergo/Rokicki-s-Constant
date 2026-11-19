@@ -7,8 +7,8 @@ The blueprint of this project is written with
 for Lean `v4.35.0`). The fork adds the side-by-side layout (each statement beside the Lean source
 of its declarations, with the prose proof and the Lean proof opened by one toggle), formulas
 typeset when the site is built, a Project Stats page and a headline card for the Comparator
-challenge. `lakefile.toml` pins it to commit `08a5079dfc7967b6a01fa5f54b8809e203557185`, together
-with the fork of Verso at `ea2e2ab37a41e50bbff0787ba896c55ea3d39df1` and the fork of SubVerso at
+challenge. `lakefile.toml` pins it to commit `9fa92b2bf1d3bf2071963157e077b011666c435d`, together
+with the fork of Verso at `9aa40617081ed144742d6fa31d5a24b77fde4679` and the fork of SubVerso at
 `f53c070f0357f5dcf3b03b8924deb714294dac69`; the published site is built with these commits.
 The dependency graph is laid out and drawn while the site is built, by the Lean library
 [PILean](https://github.com/eric-vergo/PILean) (which the fork requires, at the revision recorded in
