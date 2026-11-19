@@ -17,9 +17,10 @@ weak.doc.verso.suggestions = false
 # (all for Lean v4.35.0). The fork of Verso Blueprint adds the side-by-side layout, build-time
 # math, the Project Stats page and the Comparator headline; it is pinned to a commit of its
 # `v4.35.0` branch. Verso and SubVerso are required here, before Verso Blueprint, so that the
-# workspace uses these revisions: Verso's `sbs` branch (dark theme, web assets shipped with the
-# site) and the SubVerso commit Verso Blueprint pins. Only used by the `RokickiBlueprint`
-# library and the `BlueprintMain.lean` generator; see `blueprint/README.md`.
+# workspace uses these revisions: Verso's `sbs` branch (upstream's v4.35.0 patch release with a
+# dark theme and web assets shipped with the site) and the SubVerso commit Verso Blueprint pins.
+# Only used by the `RokickiBlueprint` library and the `BlueprintMain.lean` generator; see
+# `blueprint/README.md`.
 [[require]]
 name = "subverso"
 git = "https://github.com/eric-vergo/subverso"
@@ -28,12 +29,12 @@ rev = "f53c070f0357f5dcf3b03b8924deb714294dac69"
 [[require]]
 name = "verso"
 git = "https://github.com/eric-vergo/verso"
-rev = "ea2e2ab37a41e50bbff0787ba896c55ea3d39df1"
+rev = "9aa40617081ed144742d6fa31d5a24b77fde4679"
 
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint"
-rev = "08a5079dfc7967b6a01fa5f54b8809e203557185"
+rev = "9fa92b2bf1d3bf2071963157e077b011666c435d"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
 # take precedence over VersoBlueprint's when Lake resolves the workspace.
