@@ -74,8 +74,10 @@ did not change.
 `.github/workflows/blueprint.yml` builds the project and the site on every push to `main` (and
 when started by hand from the Actions tab) and publishes the site with GitHub Pages at
 <https://eric-vergo.github.io/Rokicki-s-Constant/>. It runs `scripts/ci-pages.sh`, which builds the
-default targets, `ComparatorChallenge` and `RokickiConstantPNT`, then the site, and fails when a
-build fails or `lake exe vbp check` reports a problem with the generated site.
+default targets, `ComparatorChallenge` and `RokickiConstantPNT`, checks the layout of the
+Comparator challenge (`lake exe vbp comparator-check`), then builds the site, and fails when a
+build fails, `lake exe vbp check` reports a problem with the generated site, or the Project Stats
+page does not show the judged theorem as proved with both kernel checkers accepting the replay.
 
 ## Writing
 
