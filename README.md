@@ -108,11 +108,12 @@ development, a chapter for the second proof, a dependency graph covering both pr
 are linked to the Lean declarations and coloured by the status of their Lean code, and a Project
 Stats page. Each statement is shown beside the Lean source of its declarations. The site is built
 with the fork [eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) at commit
-`9fa92b2bf1d3bf2071963157e077b011666c435d` (pinned in `lakefile.toml`).
+`17b967dffc12e7c0c6febcf5c479bd19f3ac02cd` (pinned in `lakefile.toml`).
 
-While the site is built, Lean's own checker `leanchecker` replays the project's compiled modules in
-the kernel; the headline and the green marks and counts appear only if it accepted them, and the
-Project Stats page reports the replay.
+While the site is built, two kernel checkers that ship with Lean, `con-leche` and `con-ron`, replay
+the project's compiled modules; the headline and the green marks and counts appear only if both
+accepted them, and the Project Stats page reports the replay. Declarations that rest on axioms
+beyond the standard three are marked as not checked.
 
 The status marks and counts on the site are about the Lean code only: they say whether the linked
 Lean declarations, and what they use, are free of `sorry`, as read from the build the site was
