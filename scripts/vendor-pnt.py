@@ -6,7 +6,8 @@ arithmetic progressions, `WeakPNT_AP`, from
 https://github.com/AlexKontorovich/PrimeNumberTheoremAnd. That project annotates its declarations
 with LeanArchitect, whose `blueprint` attribute clashes with the one of Verso Blueprint, so the
 project cannot be imported next to our blueprint. This script copies the files `WeakPNT_AP`
-needs, at a pinned commit, and removes the LeanArchitect layer. Nothing else is changed: every
+needs, at a pinned commit, removes the LeanArchitect layer, and adapts a few proof steps to the
+Mathlib revision this project is built with (`PATCHES`). No statement is changed, and every other
 proof that is kept is kept verbatim.
 
 Transformations, in order:
@@ -18,7 +19,10 @@ Transformations, in order:
    Chebotarev density theorem, is not needed).
 5. Remove the declarations listed in `DROP`: two lemmas stated with `sorry` and the one lemma
    that uses them. `WeakPNT_AP` does not depend on them.
-6. Prepend a provenance line to each file.
+6. Apply the replacements listed in `PATCHES`, each of which must match exactly once. They change
+   proof steps only, where the upstream step no longer elaborates on Mathlib `v4.36.0` (a renamed
+   lemma or induction case, a changed `simp` normal form, a step that now runs out of heartbeats).
+7. Prepend a provenance line to each file.
 
 Usage:  scripts/vendor-pnt.py [--source PATH]     (from the repository root)
 
@@ -41,6 +45,95 @@ ROOT_MODULE = "PrimeNumberTheoremAnd.Wiener"
 TRUNCATE_AFTER = {"PrimeNumberTheoremAnd/Wiener.lean": "WeakPNT_AP"}
 # file -> declarations to remove
 DROP = {"PrimeNumberTheoremAnd/Wiener.lean": ["prelim_decay_2", "prelim_decay_3", "decay_alt"]}
+# file -> (upstream text, replacement), each applied once; the upstream text must occur exactly
+# once. Proof steps only: the statements are untouched.
+PATCHES = {
+    "PrimeNumberTheoremAnd/Sobolev.lean": [
+        # Checking `iteratedDeriv 0 f` against `f` by unfolding now runs out of heartbeats;
+        # `simpa` rewrites it with `iteratedDeriv_zero`.
+        ("lemma hf (f : W21) : Integrable f := f.integrable zero_le_two",
+         "lemma hf (f : W21) : Integrable f := by simpa using f.integrable zero_le_two"),
+    ],
+    "PrimeNumberTheoremAnd/Wiener.lean": [
+        # `congr 2` runs out of heartbeats unfolding the scalar multiplication.
+        ("""    _ = (f n * (x ^ (y * I) / n ^ (σ' + y * I))) • ψ y := by
+      congr 2
+""",
+         """    _ = (f n * (x ^ (y * I) / n ^ (σ' + y * I))) • ψ y := by
+      refine congrArg (fun z ↦ (f n * z) • ψ y) ?_
+"""),
+        # Lemmas renamed in Mathlib (the old names are deprecated).
+        ("      · simp only [enorm_mul]\n", "      · simp only [eNorm_mul]\n"),
+        ("            simp [ENNReal.tsum_mul_right, enorm_eq_nnnorm]\n",
+         "            simp [ENNReal.tsum_mul_right, eNorm_eq_nnNorm]\n"),
+        ("      simpa [hasFiniteIntegral_iff_enorm, enorm_eq_nnnorm, Function.uncurry]\n",
+         "      simpa [hasFiniteIntegral_iff_eNorm, eNorm_eq_nnNorm, Function.uncurry]\n"),
+        # `Set.EqOn` is applied to a proof of membership of the set `{s | 1 < s.re}`, which is
+        # no longer unfolded from `1 < s.re` while the point is still unknown (two places).
+        ("""  have l5 : Integrable fun a ↦ A * ↑(x ^ (1 - σ')) * (↑(x ^ (σ' - 1)) *
+      (1 / (σ' + a * I - 1) * ψ a * x ^ (a * I))) := by
+    apply l7.integrable_of_hasCompactSupport
+    exact ψ.h2.mul_left.mul_right.mul_left.mul_left
+
+  simp_rw [l1 σ' hσ', l2 σ' hσ', ← integral_const_mul, ← integral_sub l4 l5]
+  apply integral_congr_ae
+  apply Eventually.of_forall
+  intro u
+  have e1 : 1 < ((σ' : ℂ) + (u : ℂ) * I).re := by simp [hσ']
+""",
+         """  have l5 : Integrable fun a ↦ A * ↑(x ^ (1 - σ')) * (↑(x ^ (σ' - 1)) *
+      (1 / (σ' + a * I - 1) * ψ a * x ^ (a * I))) := by
+    apply l7.integrable_of_hasCompactSupport
+    exact ψ.h2.mul_left.mul_right.mul_left.mul_left
+
+  simp_rw [l1 σ' hσ', l2 σ' hσ', ← integral_const_mul, ← integral_sub l4 l5]
+  apply integral_congr_ae
+  apply Eventually.of_forall
+  intro u
+  have e1 : (σ' : ℂ) + u * I ∈ {s : ℂ | 1 < s.re} := by simp [hσ']
+"""),
+        ("""  refine integral_congr_ae (.of_forall fun u ↦ ?_)
+  have e1 : 1 < ((σ' : ℂ) + (u : ℂ) * I).re := by simp [hσ']
+""",
+         """  refine integral_congr_ae (.of_forall fun u ↦ ?_)
+  have e1 : (σ' : ℂ) + u * I ∈ {s : ℂ | 1 < s.re} := by simp [hσ']
+"""),
+        # `continuity` runs out of heartbeats on these goals; `fun_prop` proves them.
+        ("""      have := continuous_FourierIntegral ψ
+      continuity
+""",
+         """      have := continuous_FourierIntegral ψ
+      fun_prop
+"""),
+        ("""      suffices h : Continuous (fun n ↦ ((rexp (-x * (n - 1))) : ℂ)) by simpa using h.tendsto 1
+      continuity
+""",
+         """      suffices h : Continuous (fun n ↦ ((rexp (-x * (n - 1))) : ℂ)) by simpa using h.tendsto 1
+      fun_prop
+"""),
+        ("    · exact (by continuity : Continuous _).aestronglyMeasurable\n",
+         "    · exact (by fun_prop : Continuous _).aestronglyMeasurable\n"),
+        # `contrapose!` warns that it has nothing to push on this goal.
+        ("    have : x ≠ 0 := by contrapose! hx ; simp [hx]\n",
+         "    have : x ≠ 0 := by rintro rfl ; simp at hx\n"),
+        # `simp` now leaves `¬ (a ≤ y ∧ y < b)` as `a ≤ y → b ≤ y`, which `tauto` does not close.
+        ("    simp [mem_Ico_iff_div hx] ; tauto\n",
+         "    simp [mem_Ico_iff_div hx] ; exact fun n hn ↦ Or.inr hn\n"),
+        # `positivity` is now run before the left end point is known to be `0`.
+        ("(Iio_mem_nhds (by positivity))", "(Iio_mem_nhds (half_pos hδ))"),
+        # `congr 1; ext t` runs out of heartbeats; the same step through `integral_congr_ae`.
+        ("""        congr 1; ext t
+        rw [← integral_add_right_eq_self""",
+         """        refine integral_congr_ae (.of_forall fun t ↦ ?_)
+        dsimp only
+        rw [← integral_add_right_eq_self"""),
+        # `congr 2 with x; ring_nf` runs out of heartbeats; `simp` closes the goal directly.
+        ("        congr 2 with x; ring_nf\n", "        simp only [neg_mul, neg_neg]\n"),
+        # The case of `Nat.strong_induction_on` is now named `ind`.
+        ("  induction n using Nat.strong_induction_on with | h n ih =>\n",
+         "  induction n using Nat.strong_induction_on with | ind n ih =>\n"),
+    ],
+}
 DEST = Path("vendor")
 
 IMPORT_RE = re.compile(r"^(?:public\s+)?import\s+(\S+)\s*$", re.M)
@@ -165,6 +258,14 @@ def transform(rel: str, text: str) -> tuple[str, str]:
         start, end = declaration_span(lines, decl, rel)
         text = "\n".join(lines[:start] + lines[end:])
         notes.append(f"removed `{decl}`")
+    for old, new in PATCHES.get(rel, []):
+        if text.count(old) != 1:
+            sys.exit(f"{rel}: a replacement of `PATCHES` matches {text.count(old)} times, "
+                     f"not once: {old.splitlines()[0]!r}")
+        text = text.replace(old, new)
+    if rel in PATCHES:
+        n = len(PATCHES[rel])
+        notes.append(f"{n} proof step{'s' if n > 1 else ''} adapted to Mathlib v4.36.0")
     if re.search(r"\bblueprint|\bArchitect\b", text):
         sys.exit(f"{rel}: LeanArchitect syntax is left after stripping")
     return squeeze_blank_lines(text), "; ".join(notes) or "unchanged"

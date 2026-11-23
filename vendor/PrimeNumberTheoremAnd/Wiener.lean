@@ -1,6 +1,6 @@
 -- Vendored from https://github.com/AlexKontorovich/PrimeNumberTheoremAnd
 -- (commit c39a751132c88b6e8080b74c74023fd95b3d8be0, file `PrimeNumberTheoremAnd/Wiener.lean`)
--- by `scripts/vendor-pnt.py`: removed `import Architect`; removed 23 `@[blueprint]` attributes; removed 35 `blueprint_comment`s; truncated after `WeakPNT_AP`; removed `prelim_decay_2`; removed `prelim_decay_3`; removed `decay_alt`. Do not edit; see `vendor/README.md`.
+-- by `scripts/vendor-pnt.py`: removed `import Architect`; removed 23 `@[blueprint]` attributes; removed 35 `blueprint_comment`s; truncated after `WeakPNT_AP`; removed `prelim_decay_2`; removed `prelim_decay_3`; removed `decay_alt`; 15 proof steps adapted to Mathlib v4.36.0. Do not edit; see `vendor/README.md`.
 import Mathlib.Analysis.Fourier.RiemannLebesgueLemma
 import Mathlib.Analysis.Normed.Group.Tannery
 import Mathlib.Analysis.SumIntegralComparisons
@@ -84,7 +84,7 @@ lemma first_fourier_aux2 (hx : 0 < x) (n : ℕ) :
         neg_mul, smul_eq_mul, ofReal_natCast]
       ring
     _ = (f n * (x ^ (y * I) / n ^ (σ' + y * I))) • ψ y := by
-      congr 2
+      refine congrArg (fun z ↦ (f n * z) • ψ y) ?_
       have l1 : 0 < (n : ℝ) := by simpa using Nat.pos_iff_ne_zero.mpr hn
       have l2 : (x : ℂ) ≠ 0 := by simp [hx.ne.symm]
       have l3 : (n : ℂ) ≠ 0 := by simp [hn]
@@ -118,11 +118,11 @@ lemma first_fourier (hf : ∀ (σ' : ℝ), 1 < σ' → Summable (nterm f σ'))
       · refine fun _ ↦ AEMeasurable.aestronglyMeasurable ?_
         have := hsupp.aemeasurable
         fun_prop
-      · simp only [enorm_mul]
+      · simp only [eNorm_mul]
         simp_rw [lintegral_const_mul'' _ (first_fourier_aux1 hsupp.aemeasurable _)]
         calc
           _ = (∑' (i : ℕ), ‖term f σ' i‖ₑ) * ∫⁻ (a : ℝ), ‖ψ a‖ₑ ∂volume := by
-            simp [ENNReal.tsum_mul_right, enorm_eq_nnnorm]
+            simp [ENNReal.tsum_mul_right, eNorm_eq_nnNorm]
           _ ≠ ⊤ := ENNReal.mul_ne_top (hf_coe1 hf hσ)
             (ne_top_of_lt hsupp.2)
     _ = _ := by
@@ -165,7 +165,7 @@ lemma second_fourier_integrable_aux1 (hcont : Measurable ψ) (hsupp : Integrable
   · let f1 : ℝ → ENNReal := fun a1 ↦ ‖cexp (-(↑a1 * (↑σ' - 1)))‖ₑ
     let f2 : ℝ → ENNReal := fun a2 ↦ ‖ψ a2‖ₑ
     suffices ∫⁻ (a : ℝ × ℝ), f1 a.1 * f2 a.2 ∂ν < ⊤ by
-      simpa [hasFiniteIntegral_iff_enorm, enorm_eq_nnnorm, Function.uncurry]
+      simpa [hasFiniteIntegral_iff_eNorm, eNorm_eq_nnNorm, Function.uncurry]
     refine (lintegral_prod_mul ?_ ?_).trans_lt ?_ <;> try fun_prop
     exact ENNReal.mul_lt_top (second_fourier_integrable_aux1a hσ).2 hsupp.2
 
@@ -363,7 +363,7 @@ lemma limiting_fourier_aux (hG' : Set.EqOn G (fun s ↦ LSeries f s - A / (s - 1
   apply integral_congr_ae
   apply Eventually.of_forall
   intro u
-  have e1 : 1 < ((σ' : ℂ) + (u : ℂ) * I).re := by simp [hσ']
+  have e1 : (σ' : ℂ) + u * I ∈ {s : ℂ | 1 < s.re} := by simp [hσ']
   simp_rw [hG' e1, sub_mul, ← mul_assoc]
   simp only [one_div, sub_right_inj, mul_eq_mul_right_iff, cpow_eq_zero_iff, ofReal_eq_zero, ne_eq,
     mul_eq_zero, I_ne_zero, or_false]
@@ -864,7 +864,7 @@ theorem limiting_fourier_lim2 (A : ℝ) (ψ : W21) (hx : 1 ≤ x) :
     · apply Eventually.of_forall ; intro σ'
       apply Continuous.aestronglyMeasurable
       have := continuous_FourierIntegral ψ
-      continuity
+      fun_prop
     · apply eventually_of_mem (U := Ioo 1 2)
       · apply Ioo_mem_nhdsGT_of_mem ; simp
       · intro σ' ⟨h1, h2⟩
@@ -897,7 +897,7 @@ theorem limiting_fourier_lim2 (A : ℝ) (ψ : W21) (hx : 1 ≤ x) :
         simpa using h.mul_const _
       apply Tendsto.mono_left ?_ nhdsWithin_le_nhds
       suffices h : Continuous (fun n ↦ ((rexp (-x * (n - 1))) : ℂ)) by simpa using h.tendsto 1
-      continuity
+      fun_prop
 
 theorem limiting_fourier_lim3 (hG : ContinuousOn G {s | 1 ≤ s.re}) (ψ : CS 2 ℂ) (hx : 1 ≤ x) :
     Tendsto (fun σ' : ℝ ↦ ∫ t : ℝ, G (σ' + t * I) * ψ t * x ^ (t * I)) (𝓝[>] 1)
@@ -1084,7 +1084,7 @@ lemma hh'_nonpos {a x : ℝ} (ha : a ∈ Ioo (-1) 1) : hh' a x ≤ 0 := by
 lemma hh_antitone {a : ℝ} (ha : a ∈ Ioo (-1) 1) : AntitoneOn (hh a) (Ioi 0) := by
   have l1 x (hx : x ∈ interior (Ioi 0)) :
       HasDerivWithinAt (hh a) (hh' a x) (interior (Ioi 0)) x := by
-    have : x ≠ 0 := by contrapose! hx ; simp [hx]
+    have : x ≠ 0 := by rintro rfl ; simp at hx
     exact (hh_deriv a this).hasDerivWithinAt
   apply antitoneOn_of_hasDerivWithinAt_nonpos (convex_Ioi _) (hh_continuous _) l1
     (fun x _ => hh'_nonpos ha)
@@ -2022,7 +2022,7 @@ lemma mem_Ico_iff_div (hx : 0 < x) : n ∈ Finset.Ico ⌈a * x⌉₊ ⌈b * x⌉
 lemma tsum_indicator {f : ℕ → ℝ} (hx : 0 < x) :
     ∑' n, f n * (indicator (Ico a b) 1 (n / x)) = ∑ n ∈ Finset.Ico ⌈a * x⌉₊ ⌈b * x⌉₊, f n := by
   have l1 : ∀ n ∉ Finset.Ico ⌈a * x⌉₊ ⌈b * x⌉₊, f n * indicator (Ico a b) 1 (↑n / x) = 0 := by
-    simp [mem_Ico_iff_div hx] ; tauto
+    simp [mem_Ico_iff_div hx] ; exact fun n hn ↦ Or.inr hn
   rw [tsum_eq_sum l1] ; apply Finset.sum_congr rfl ; simp only [mem_Ico_iff_div hx] ; intro n hn ; simp [hn]
 
 lemma WienerIkeharaInterval_discrete {f : ℕ → ℝ} (hpos : 0 ≤ f) (hf : ∀ (σ' : ℝ), 1 < σ' → Summable (nterm f σ'))
@@ -2048,7 +2048,7 @@ continuously to the closed half-plane `re s ≥ 1`, then `∑ n < N, f n` is asy
 lemma tendsto_mul_ceil_div :
     Tendsto (fun (p : ℝ × ℕ) => ⌈p.1 * p.2⌉₊ / (p.2 : ℝ)) (𝓝[>] 0 ×ˢ atTop) (𝓝 0) := by
   rw [Metric.tendsto_nhds] ; intro δ hδ
-  have l1 : ∀ᶠ ε : ℝ in 𝓝[>] 0, ε ∈ Ioo 0 (δ / 2) := inter_mem_nhdsWithin _ (Iio_mem_nhds (by positivity))
+  have l1 : ∀ᶠ ε : ℝ in 𝓝[>] 0, ε ∈ Ioo 0 (δ / 2) := inter_mem_nhdsWithin _ (Iio_mem_nhds (half_pos hδ))
   have l2 : ∀ᶠ N : ℕ in atTop, 1 ≤ δ / 2 * N := by
     apply Tendsto.eventually_ge_atTop
     exact tendsto_natCast_atTop_atTop.const_mul_atTop (by positivity)
@@ -2175,7 +2175,7 @@ lemma limiting_fourier_aux_gt_zero (hG' : Set.EqOn G (fun s ↦ LSeries f s - A 
   simp_rw [first_fourier hf hint hx hσ', second_fourier ψ.h1.continuous.measurable hint hx hσ',
     ← integral_const_mul, ← integral_sub l4 l5]
   refine integral_congr_ae (.of_forall fun u ↦ ?_)
-  have e1 : 1 < ((σ' : ℂ) + (u : ℂ) * I).re := by simp [hσ']
+  have e1 : (σ' : ℂ) + u * I ∈ {s : ℂ | 1 < s.re} := by simp [hσ']
   simp_rw [hG' e1, sub_mul, ← mul_assoc]
   simp only [one_div, sub_right_inj, mul_eq_mul_right_iff, cpow_eq_zero_iff, ofReal_eq_zero, ne_eq,
     mul_eq_zero, I_ne_zero, or_false]
@@ -3186,7 +3186,7 @@ lemma Real.fourierIntegral_convolution {f g : ℝ → ℂ} (hf : Integrable f) (
     simp only [Circle.smul_def, smul_eq_mul]
     refine (Integrable.convolution_integrand (ContinuousLinearMap.mul ℂ ℂ) hf hg).bdd_mul
       (c := 1) ?_ ?_
-    · exact (by continuity : Continuous _).aestronglyMeasurable
+    · exact (by fun_prop : Continuous _).aestronglyMeasurable
     · filter_upwards with p; simp
   calc ∫ v, 𝐞 (-(y * v)) • ∫ t, f t * g (v - t)
       = ∫ v, ∫ t, 𝐞 (-(y * v)) • (f t * g (v - t)) := by
@@ -3195,7 +3195,8 @@ lemma Real.fourierIntegral_convolution {f g : ℝ → ℂ} (hf : Integrable f) (
     _ = ∫ t, f t • ∫ v, 𝐞 (-(y * v)) • g (v - t) := by
         simp only [Circle.smul_def, smul_eq_mul, mul_left_comm, integral_const_mul]
     _ = ∫ t, f t • ∫ u, 𝐞 (-(y * (u + t))) • g u := by
-        congr 1; ext t
+        refine integral_congr_ae (.of_forall fun t ↦ ?_)
+        dsimp only
         rw [← integral_add_right_eq_self (fun v ↦ 𝐞 (-(y * v)) • g (v - t)) t]; simp
     _ = ∫ t, f t • ∫ u, (𝐞 (-(y * t)) * 𝐞 (-(y * u))) • g u := by
         congr 2 with t; congr 1
@@ -3220,7 +3221,7 @@ lemma Real.fourierIntegral_conj_neg {f : ℝ → ℂ} (y : ℝ) :
     _ = conj (∫ x, 𝐞 (x * y) • f (-x)) := integral_conj
     _ = conj (∫ x, 𝐞 (-(x * y)) • f x) := by
         rw [← integral_neg_eq_self (fun x => 𝐞 (-(x * y)) • f x)]
-        congr 2 with x; ring_nf
+        simp only [neg_mul, neg_neg]
 
 /-- Smooth compactly supported function with non-negative Fourier transform via self-convolution. -/
 lemma auto_cheby_exists_smooth_nonneg_fourier_kernel :
@@ -3455,7 +3456,7 @@ lemma auto_cheby_bootstrap_induction (hpos : 0 ≤ f)
   have hdiv : 0 ≤ C₀ / ε := div_nonneg hC₀.le hε.le
   have hC : 0 ≤ C := by linarith
   refine ⟨C, fun n ↦ ?_⟩
-  induction n using Nat.strong_induction_on with | h n ih =>
+  induction n using Nat.strong_induction_on with | ind n ih =>
   rcases lt_or_ge n 2 with hn | hn
   · interval_cases n
     · simp [cumsum]
