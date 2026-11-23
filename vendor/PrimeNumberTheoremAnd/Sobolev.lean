@@ -1,6 +1,6 @@
 -- Vendored from https://github.com/AlexKontorovich/PrimeNumberTheoremAnd
 -- (commit c39a751132c88b6e8080b74c74023fd95b3d8be0, file `PrimeNumberTheoremAnd/Sobolev.lean`)
--- by `scripts/vendor-pnt.py`: unchanged. Do not edit; see `vendor/README.md`.
+-- by `scripts/vendor-pnt.py`: 1 proof step adapted to Mathlib v4.36.0. Do not edit; see `vendor/README.md`.
 import Mathlib.Analysis.Calculus.Deriv.Support
 import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
 import Mathlib.Order.Filter.ZeroAndBoundedAtFilter
@@ -217,7 +217,7 @@ instance : HMul (CS 2 ℂ) W21 (CS 2 ℂ) where
 
 instance : HMul (CS 2 ℝ) W21 (CS 2 ℂ) where hMul g f := (g : CS 2 ℂ) * f
 
-lemma hf (f : W21) : Integrable f := f.integrable zero_le_two
+lemma hf (f : W21) : Integrable f := by simpa using f.integrable zero_le_two
 
 lemma hf' (f : W21) : Integrable (deriv f) := by
   simpa [iteratedDeriv_succ] using f.integrable one_le_two

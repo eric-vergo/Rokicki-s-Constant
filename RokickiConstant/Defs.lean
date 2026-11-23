@@ -36,7 +36,7 @@ Tom Rokicki observed that `aₙ / 2 ^ (n - 1)` converges, and `ρ` is its limit.
 * `RokickiConstant.χ₄_oddPrime`: the `k`-th digit is encoded by the value of the nontrivial
   Dirichlet character modulo `4` at the corresponding odd prime, `χ₄ pₖ₊₂ = 1 - 2 · rokickiDigit k`.
 
-The irrationality of `ρ` is proved in `Comparator/Solution.lean`.
+The irrationality of `ρ` is proved in `Comparator/RhoIrrational/Solution.lean`.
 
 ## References
 

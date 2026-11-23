@@ -156,8 +156,9 @@ theorem exp_abelSeries_add_primePowerPart {s : ℂ} (hs : 1 / 2 < s.re) :
   have hf : AnalyticOnNhd ℂ
       (fun s ↦ exp (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime s + primePowerPart s))
       {s : ℂ | 1 / 2 < s.re} :=
-    (((differentiableOn_abelSeries_chi4 hC).mono fun s (hs : 1 / 2 < s.re) ↦
-      show 0 < s.re by linarith).add differentiableOn_primePowerPart).cexp.analyticOnNhd hU
+    (((differentiableOn_abelSeries_chi4 hC).mono (s := {s : ℂ | 1 / 2 < s.re}) fun s hs ↦
+      show 0 < s.re by have h : (1 : ℝ) / 2 < s.re := hs; linarith).add
+        differentiableOn_primePowerPart).cexp.analyticOnNhd hU
   have hg : AnalyticOnNhd ℂ (DirichletCharacter.LFunction chi4) {s : ℂ | 1 / 2 < s.re} :=
     (DirichletCharacter.differentiable_LFunction chi4_ne_one).differentiableOn.analyticOnNhd hU
   have hfg : (fun s ↦ exp (abelSeries (fun k ↦ chi4 (oddPrime k)) oddPrime s +

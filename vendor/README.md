@@ -28,13 +28,28 @@ could not link its statements to the Lean code of the second proof.
 | `blueprint_comment /-- ... -/` commands removed (36) | `Wiener.lean`, `SmoothExistence.lean` |
 | file cut after the proof of `WeakPNT_AP` (the rest is on the Chebotarev density theorem) | `Wiener.lean` |
 | `prelim_decay_2`, `prelim_decay_3` (stated with `sorry`) and `decay_alt` (their only user) removed | `Wiener.lean` |
+| 15 proof steps adapted to Mathlib `v4.36.0` (`PATCHES` in the script) | `Wiener.lean` |
+| 1 proof step adapted to Mathlib `v4.36.0` | `Sobolev.lean` |
 | three-line provenance comment added at the top | every file |
 
-`Fourier.lean`, `Sobolev.lean` and the two files under `Mathlib/` are otherwise unchanged.
-Every declaration that is kept has its upstream statement and proof, character for character.
-The script stops with an error if it meets LeanArchitect syntax it does not handle.
+`Fourier.lean` and the two files under `Mathlib/` are otherwise unchanged. Every declaration that
+is kept has its upstream statement, character for character.
+
+The upstream commit is written for an earlier Mathlib, and a few of its proof steps no longer
+elaborate on the Mathlib `v4.36.0` this project is built with. `PATCHES` replaces each of them
+with a step that does, and says why next to it: three lemmas renamed in Mathlib, an induction case
+renamed, two goals whose `simp` normal form or elaboration order changed, two applications of a
+`Set.EqOn` hypothesis to a proof of membership, a `contrapose!` with nothing to push, and six
+steps (`congr`, `continuity`) that run out of heartbeats and are replaced by a direct step
+(`congrArg`, `integral_congr_ae`, `fun_prop`, `simp`); in `Sobolev.lean`, one `exact` that runs
+out of heartbeats becomes `simpa`. No `maxHeartbeats` option is raised.
+Every other proof that is kept is the upstream proof, character for character.
+
+The script stops with an error if it meets LeanArchitect syntax it does not handle, or if a
+replacement of `PATCHES` does not match exactly once.
 
 ### Updating
 
 Change `COMMIT` in `scripts/vendor-pnt.py`, run the script, then `lake build RokickiConstantPNT`.
-The upstream commit must be compatible with the Mathlib revision pinned in `lakefile.toml`.
+The upstream commit must be compatible with the Mathlib revision pinned in `lakefile.toml`, up to
+the replacements in `PATCHES`: drop those that the new commit no longer needs.

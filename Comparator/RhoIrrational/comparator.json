@@ -1,0 +1,6 @@
+{
+  "challenge_module": "Comparator.RhoIrrational.Challenge",
+  "solution_module": "Comparator.RhoIrrational.Solution",
+  "theorem_names": ["rho_irrational"],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}

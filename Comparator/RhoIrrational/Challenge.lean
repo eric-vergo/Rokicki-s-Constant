@@ -15,8 +15,8 @@ Let `p₁ = 2 < p₂ = 3 < p₃ = 5 < ⋯` be the primes, so that `Nat.nth Nat.P
 whose binary digits record, odd prime by odd prime, whether `p ≡ 3 (mod 4)`. Prove that `ρ` is
 irrational.
 
-The solution is in `Comparator/Solution.lean`, which differs from this file only in its imports
-and in the proof of `rho_irrational`.
+The solution is in `Comparator/RhoIrrational/Solution.lean`, which differs from this file only in
+its imports and in the proof of `rho_irrational`.
 -/
 
 @[expose] public section

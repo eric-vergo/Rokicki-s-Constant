@@ -10,7 +10,10 @@ set -euo pipefail
 lake build
 lake build ComparatorChallenge RokickiConstantPNT
 
-# The site.
+# The layout of the Comparator challenge (Comparator/<Name>/), checked from the files alone.
+lake exe vbp comparator-check
+
+# The site, with the kernel replay of the compiled modules by con-leche and con-ron.
 lake exe vbp build
 
 # The consistency check of the generated site prints a JSON report with "ok": true or false.
@@ -24,3 +27,7 @@ esac
 test -f _out/site/html-multi/index.html
 test -f _out/site/html-multi/-verso-data/blueprint-manifest.json
 test -f _out/site/html-multi/-verso-data/blueprint-html-cache.json
+
+# The headline: the judged theorem is proved and both kernel checkers accepted the replay.
+grep -Eq 'class="[^"]*bp_stats_verdict_proved' _out/site/html-multi/Project-Stats/index.html
+grep -Eq 'class="[^"]*bp_stats_replay_accepted' _out/site/html-multi/Project-Stats/index.html
