@@ -77,8 +77,11 @@ the dependency graph at the end records which results each proof uses.
 
 # The formal statement
 
-The comparator file `Comparator/Challenge.lean` states the problem with no reference to the
-development, and `Comparator/Solution.lean` proves it:
+The comparator file
+{repoFile "Comparator/RhoIrrational/Challenge.lean"}[`Comparator/RhoIrrational/Challenge.lean`]
+states the problem with no reference to the development, and
+{repoFile "Comparator/RhoIrrational/Solution.lean"}[`Comparator/RhoIrrational/Solution.lean`]
+proves it:
 
 ```
 noncomputable def rho : ℝ :=

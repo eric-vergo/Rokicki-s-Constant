@@ -24,9 +24,13 @@ prime number theorem in arithmetic progressions, which says that the primes are 
 between the classes $`1` and $`3` modulo $`4`. The Lean development of this chapter is the
 library `RokickiConstantPNT`. The following theorem is taken from the
 [PrimeNumberTheoremAnd](https://github.com/AlexKontorovich/PrimeNumberTheoremAnd) project. The
-files that prove it are vendored in `vendor/PrimeNumberTheoremAnd/`, with the LeanArchitect
-blueprint annotations of that project removed by `scripts/vendor-pnt.py` so that they can be
-imported here; its proof is not charted in the dependency graph.
+files that prove it are vendored in
+{repoFile "vendor/PrimeNumberTheoremAnd"}[`vendor/PrimeNumberTheoremAnd/`], with the
+LeanArchitect blueprint annotations of that project removed and a few proof steps adapted to the
+Mathlib release this project is built with by
+{repoFile "scripts/vendor-pnt.py"}[`scripts/vendor-pnt.py`] so that they can be imported here
+(see {repoFile "vendor/README.md"}[`vendor/README.md`]); its proof is not charted in the
+dependency graph.
 
 :::theorem "pnt_ap" (lean := "WeakPNT_AP")
 Let $`q \geq 1` and let $`0 \leq a < q` be coprime to $`q`. Then, with $`\Lambda` the von Mangoldt

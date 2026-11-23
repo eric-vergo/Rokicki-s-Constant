@@ -17,9 +17,9 @@ Let `p₁ = 2 < p₂ = 3 < p₃ = 5 < ⋯` be the primes, so that `Nat.nth Nat.P
 whose binary digits record, odd prime by odd prime, whether `p ≡ 3 (mod 4)`. Prove that `ρ` is
 irrational.
 
-This file differs from the challenge `Comparator/Challenge.lean` only in its imports and in the
-proof of `rho_irrational`. If `ρ` were rational its binary digits would be eventually periodic
-(`eventuallyPeriodic_of_tsum_div_two_pow_mem_range_ratCast`), hence so would the values
+This file differs from the challenge `Comparator/RhoIrrational/Challenge.lean` only in its imports
+and in the proof of `rho_irrational`. If `ρ` were rational its binary digits would be eventually
+periodic (`eventuallyPeriodic_of_tsum_div_two_pow_mem_range_ratCast`), hence so would the values
 `χ₄ pₖ₊₂ = 1 - 2 · [pₖ₊₂ ≡ 3 (mod 4)]` of the nontrivial Dirichlet character modulo `4`, and the
 partial sums of `χ₄` over the odd primes would be `c · n + O(1)`
 (`Function.EventuallyPeriodic.exists_abs_sum_sub_mul_le`). But those partial sums are neither

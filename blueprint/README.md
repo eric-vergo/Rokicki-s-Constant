@@ -3,13 +3,14 @@
 The blueprint of this project is written with
 [Verso Blueprint](https://github.com/leanprover/verso-blueprint), the Verso-based successor of
 `leanblueprint`, in the version of the fork
-[eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) (branch `v4.35.0`,
-for Lean `v4.35.0`). The fork adds the side-by-side layout (each statement beside the Lean source
+[eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) (branch `v4.36.0`,
+for Lean `v4.36.0`). The fork adds the side-by-side layout (each statement beside the Lean source
 of its declarations, with the prose proof and the Lean proof opened by one toggle), formulas
 typeset when the site is built, a Project Stats page and a headline card for the Comparator
-challenge. `lakefile.toml` pins it to commit `17b967dffc12e7c0c6febcf5c479bd19f3ac02cd`, together
-with the fork of Verso at `9aa40617081ed144742d6fa31d5a24b77fde4679` and the fork of SubVerso at
-`f53c070f0357f5dcf3b03b8924deb714294dac69`; the published site is built with these commits.
+challenge, with a page for the challenge. `lakefile.toml` pins it to commit
+`29d7bff6de00c53b0cd06aeb4c1349a801fe2e05`, together with the fork of Verso at
+`94cea086b880f61f5b3847d30151b8e5f80e1259` and the fork of SubVerso at
+`4e04c61d96960d5a1461c6c870572ccb8b45a495`; the published site is built with these commits.
 The dependency graph is laid out and drawn while the site is built, by the Lean library
 [PILean](https://github.com/eric-vergo/PILean) (which the fork requires, at the revision recorded in
 `lake-manifest.json`), so the page ships no graph-layout program.
@@ -88,5 +89,5 @@ statements.
 theorem, both linked to Lean declarations with `(lean := "...")`, and a dependency `{uses "..."}[]`
 between them. The status colours of the graph are computed from the linked Lean declarations
 (complete, contains `sorry`, missing); there is no manual `\leanok`. See the
-[manual](https://github.com/leanprover/verso-blueprint/blob/v4.35.0/doc/MANUAL.md) for the full
+[manual](https://github.com/eric-vergo/verso-blueprint/blob/v4.36.0/doc/MANUAL.md) for the full
 syntax.

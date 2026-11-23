@@ -48,11 +48,11 @@ name = "RokickiConstant"
 
 [[lean_lib]]
 name = "Comparator"
-roots = ["Comparator.Solution"]
+roots = ["Comparator.RhoIrrational.Solution"]
 
 [[lean_lib]]
 name = "ComparatorChallenge"
-roots = ["Comparator.Challenge"]
+roots = ["Comparator.RhoIrrational.Challenge"]
 
 # The part of PrimeNumberTheoremAnd (https://github.com/AlexKontorovich/PrimeNumberTheoremAnd)
 # that proves the prime number theorem in arithmetic progressions (`WeakPNT_AP`), vendored in

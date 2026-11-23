@@ -3,16 +3,16 @@ Copyright (c) 2026 Eric Vergo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo
 -/
-import Comparator.Solution
+import Comparator.RhoIrrational.Solution
 import RokickiConstantPNT.CharacterSums
 
 /-!
 # Rokicki's constant is irrational: a second proof, by the prime number theorem
 
 This file proves `Irrational rho` a second time, for the constant `rho` of
-`Comparator/Solution.lean`. The reduction is the one of `rho_irrational`: if `ρ` were rational its
-binary digits would be eventually periodic, and the partial sums of `χ₄` over the odd primes would
-be `c · n + O(1)` for some `c`.
+`Comparator/RhoIrrational/Solution.lean`. The reduction is the one of `rho_irrational`: if `ρ` were
+rational its binary digits would be eventually periodic, and the partial sums of `χ₄` over the odd
+primes would be `c · n + O(1)` for some `c`.
 
 * The case `c ≠ 0` is ruled out by the prime number theorem in arithmetic progressions
   (`RokickiConstant.PNT.not_exists_abs_sum_chi4_sub_mul_le`): the primes are equidistributed

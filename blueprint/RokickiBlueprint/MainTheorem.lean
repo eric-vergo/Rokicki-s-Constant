@@ -5,7 +5,7 @@ Authors: Eric Vergo
 -/
 import VersoManual
 import VersoBlueprint
-import Comparator.Solution
+import Comparator.RhoIrrational.Solution
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -17,8 +17,11 @@ open Informal
 tag := "chapter-main-theorem"
 %%%
 
-The comparator file `Comparator/Challenge.lean` states the problem without reference to the
-development; `Comparator/Solution.lean` is the same file with the proof filled in.
+The comparator file
+{repoFile "Comparator/RhoIrrational/Challenge.lean"}[`Comparator/RhoIrrational/Challenge.lean`]
+states the problem without reference to the development;
+{repoFile "Comparator/RhoIrrational/Solution.lean"}[`Comparator/RhoIrrational/Solution.lean`]
+is the same file with the proof filled in.
 
 :::definition "rho" (lean := "rho")
 $$`\rho = \sum_{k \geq 0} \frac{[\,p_{k+2} \equiv 3 \pmod 4\,]}{2^{k+1}}.`
