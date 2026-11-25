@@ -116,7 +116,7 @@ development, a chapter for the second proof, a dependency graph covering both pr
 are linked to the Lean declarations and coloured by the status of their Lean code, and a Project
 Stats page. Each statement is shown beside the Lean source of its declarations. The site is built
 with the fork [eric-vergo/verso-blueprint](https://github.com/eric-vergo/verso-blueprint) at commit
-`92e4c9de3725add8d3a46d85902c65134ee309c8` (pinned in `lakefile.toml`).
+`cc82fb88974659b6890997a1975d21f7cd4d280c` (pinned in `lakefile.toml`).
 
 While the site is built, two kernel checkers that ship with Lean, `con-leche` and `con-ron`, replay
 the project's compiled modules; the headline and the green marks and counts appear only if both
