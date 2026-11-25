@@ -8,7 +8,7 @@ for Lean `v4.36.0`). The fork adds the side-by-side layout (each statement besid
 of its declarations, with the prose proof and the Lean proof opened by one toggle), formulas
 typeset when the site is built, a Project Stats page and a headline card for the Comparator
 challenge, with a page for the challenge. `lakefile.toml` pins it to commit
-`5170bcf2aa10844dbdec717ffb4c2e343d9b95ea`, together with the fork of Verso at
+`02159cd8cb5b69babf94817cdeabb93064d6f0e1`, together with the fork of Verso at
 `94cea086b880f61f5b3847d30151b8e5f80e1259` and the fork of SubVerso at
 `27c7e30ea5c25f3bbb7fad1badafd7a3d3eeb19f`; the published site is built with these commits.
 The dependency graph is laid out and drawn while the site is built, by the Lean library
